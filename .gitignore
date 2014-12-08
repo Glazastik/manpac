@@ -4,6 +4,7 @@ cabal-dev
 *.hi
 *.chi
 *.chs.h
+*.html
 .virtualenv
 .hsenv
 .cabal-sandbox/
