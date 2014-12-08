@@ -17,3 +17,4 @@ newCanvas w h = do
 main = do
 	canvasElem <- newCanvas width height
 	Just canvas <- getCanvas canvasElem
+	setChildren documentBody [canvasElem]
