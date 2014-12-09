@@ -9,7 +9,7 @@ data GameState = GameState {
     wallBlocks :: [Wall]
   }
 
-type Wall = Rectangle
+type Wall = Rect
 
 -- Width and height of the playing field.
 width, height :: Double
