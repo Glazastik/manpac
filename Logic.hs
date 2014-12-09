@@ -22,7 +22,7 @@ manPacRadius = 15
 
 -- How fast is manPac
 manPacSpeed :: Double
-manPacSpeed = 10
+manPacSpeed = 5
 
 -- | Move a point by a certain velocity.
 move :: Point -> Vector -> Point
