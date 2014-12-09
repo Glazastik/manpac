@@ -9,7 +9,7 @@ data GameState = GameState {
     wallBlocks :: [Wall]
   }
 
-type Wall = Rectangle
+type Wall = Rect
 
 -- Width and height of the playing field.
 width, height :: Double
@@ -44,12 +44,18 @@ changeManPacDir :: S.Set Char -> GameState -> GameState
 changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D' 
   where
     pacDir up down left right
-      | up `S.member` keys   = state { manPacDir = (0, -manPacSpeed) }
-      | down `S.member` keys = state { manPacDir = (0, manPacSpeed)  }
-      | left `S.member` keys = state { manPacDir = (-manPacSpeed, 0) }
-      | right `S.member`keys = state { manPacDir = (manPacSpeed, 0)  }
+      | (up `S.member` keys) && invalidDir (manPacPos state) (0, -manPacSpeed)   = state { manPacDir = (0, -manPacSpeed) }
+      | (down `S.member` keys) && invalidDir (manPacPos state) (0, manPacSpeed)  = state { manPacDir = (0, manPacSpeed)  }
+      | (left `S.member` keys) && invalidDir (manPacPos state) (-manPacSpeed, 0) = state { manPacDir = (-manPacSpeed, 0) }
+      | (right `S.member`keys) && invalidDir (manPacPos state) (manPacSpeed, 0)  = state { manPacDir = (manPacSpeed, 0)  }
       | otherwise            = state
 
+invalidDir :: Point -> Vector -> Bool
+invalidDir coordinate dir = not $ invalidDir' $ coordinate `move` dir
+
+invalidDir' :: Point -> Bool
+invalidDir' (x,y) = (x+manPacRadius) > width || (x-manPacRadius) < 0 
+					|| (y+manPacRadius) > height || (y-manPacRadius) < 0
 
 initialState :: GameState
 initialState = GameState {
