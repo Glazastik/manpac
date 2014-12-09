@@ -34,7 +34,7 @@ clamp (x, y) (Rect xMin yMin xMax yMax) =
 moveManPac :: GameState -> GameState
 moveManPac state = state {manPacPos = (manPacPos state `move` manPacDir state) `clamp` playingField}
  where
-    playingField = Rect (manPacRadius * 1) (manPacRadius * 1) (width - manPacRadius) (height - manPacRadius)
+    playingField = Rect manPacRadius manPacRadius (width - manPacRadius) (height - manPacRadius)
 
 -- | Update the paddles depending on the currently pressed keys.
 changeManPacDir :: S.Set Char -> GameState -> GameState
