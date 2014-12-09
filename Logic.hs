@@ -72,7 +72,7 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
 
 invalidDir :: GameState -> Vector -> Bool
 invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
-	&& invalidDir'' ((manPacPos state) `move` (manPacDir state)) state
+	|| invalidDir'' ((manPacPos state) `move` (manPacDir state)) state
 
 invalidDir' :: Point -> Bool
 invalidDir' (x,y) = (x+manPacRadius) > width || (x-manPacRadius) < 0 
