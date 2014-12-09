@@ -1,6 +1,14 @@
 import Haste
 import Haste.Graphics.Canvas
+import qualified Data.Set as S
+import Data.IORef
+import Data.Char
 import Logic
+
+-- | Render the game's state to a canvas.
+renderState :: Canvas -> GameState -> IO ()
+renderState can state = render can $ do
+	manPac (manPacPos state)
 
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
@@ -14,11 +22,29 @@ newCanvas w h = do
 	setProp canvas "height" (show h)
 	return canvas
 
+-- | A unit of time, updates the game state accordingly.
+tick :: Canvas -> IORef (S.Set Char) -> GameState -> IO ()
+tick can keysRef state = do
+    keys <- readIORef keysRef
+    let state' = update keys state
+    renderState can state'
+    setTimeout 30 $ tick can keysRef state'
+  where
+    update keys state = moveManPac keys state
+
 main = do
 	canvasElem <- newCanvas width height
 	Just canvas <- getCanvas canvasElem
 	setChildren documentBody [canvasElem]
 	render canvas $ do manPac (height/2,width/2)
+
+	keysPressed <- newIORef S.empty
+  	documentBody `onEvent` OnKeyDown $ \k -> do
+    	atomicModifyIORef keysPressed $ \keys -> (S.insert (chr k) keys, ())
+  	documentBody `onEvent` OnKeyUp $ \k -> do
+    	atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
+
+	tick canvas keysPressed initialState
 
 manPac :: Point -> Picture () 
 manPac pt = color (RGB 255 255 0) $ do
