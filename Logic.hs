@@ -3,7 +3,7 @@ import Haste.Graphics.Canvas
 
 -- | The state of our game.
 data GameState = GameState {
-    manPacPos :: Point
+    manPacPos :: Point,
     manPacDir :: Vector
   }
 
