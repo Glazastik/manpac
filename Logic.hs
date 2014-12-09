@@ -59,7 +59,7 @@ invalidDir' (x,y) = (x+manPacRadius) > width || (x-manPacRadius) < 0
 
 initialState :: GameState
 initialState = GameState {
-	manPacPos = (width/2, height/2),
+	manPacPos = (width/2, manPacRadius*23),
     manPacDir = (0,0),
     wallBlocks = walls
 }
