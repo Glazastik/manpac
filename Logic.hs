@@ -65,4 +65,4 @@ initialState = GameState {
 }
 
 walls :: [Rect]
-walls = []
+walls = [Rect 100 100 100 50]

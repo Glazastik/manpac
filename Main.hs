@@ -9,6 +9,7 @@ import Logic
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	manPac (manPacPos state)
+	mapM_ wallPic $ (wallBlocks state) 
 
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
