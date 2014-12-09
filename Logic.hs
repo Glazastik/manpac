@@ -32,7 +32,9 @@ clamp (x, y) (Rect xMin yMin xMax yMax) =
 
 -- | Update the ball's position with its velocity.
 moveManPac :: GameState -> GameState
-moveManPac state = state {manPacPos = manPacPos state `move` manPacDir state}
+moveManPac state = state {manPacPos = (manPacPos state `move` manPacDir state) `clamp` playingField}
+ where
+    playingField = Rect (manPacRadius * 1) (manPacRadius * 1) (width - manPacRadius) (height - manPacRadius)
 
 -- | Update the paddles depending on the currently pressed keys.
 changeManPacDir :: S.Set Char -> GameState -> GameState
