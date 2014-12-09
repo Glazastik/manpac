@@ -36,7 +36,7 @@ moveManPac keys state = state {
       manPacPos  = movePac 'W' 'S' 'A' 'D' (manPacPos state) `clamp` playingField
     }
   where
-    playingField = Rect 0 0 width height
+    playingField = Rect (manPacRadius * 1) (manPacRadius * 1) (width - manPacRadius) (height - manPacRadius)
     movePac up down left right pac
       | up `S.member` keys   = pac `move` (0, -manPacSpeed)
       | down `S.member` keys = pac `move` (0, manPacSpeed)
