@@ -30,7 +30,9 @@ tick can keysRef state = do
     renderState can state'
     setTimeout 30 $ tick can keysRef state'
   where
-    update keys state = moveManPac keys state
+    update keys = do
+     changeManPacDir keys
+     moveManPac
 
 main = do
   canvasElem <- newCanvas width height

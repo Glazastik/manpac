@@ -40,9 +40,9 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
   where
     pacDir up down left right
       | up `S.member` keys   = state { manPacDir = (0, -manPacSpeed) }
-      | down `S.member` keys = state { manPacDir = (0, manPacSpeed) }
+      | down `S.member` keys = state { manPacDir = (0, manPacSpeed)  }
       | left `S.member` keys = state { manPacDir = (-manPacSpeed, 0) }
-      | right `S.member`keys = state { manPacDir = (manPacSpeed, 0) }
+      | right `S.member`keys = state { manPacDir = (manPacSpeed, 0)  }
       | otherwise            = state
 
 
