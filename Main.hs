@@ -6,10 +6,10 @@ import Logic
 newCanvas :: Double -> Double -> IO Elem
 newCanvas w h = do
 	canvas <- newElem "canvas"
-	setStyle canvas "border" "1px solid black"
+	setStyle canvas "border" "2px solid blue"
 	setStyle canvas "display" "block"
 	setStyle canvas "margin" "auto"
-	setStyle canvas "background-color" "pink"
+	setStyle canvas "background-color" "black"
 	setProp canvas "width" (show w)
 	setProp canvas "height" (show h)
 	return canvas
