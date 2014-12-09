@@ -5,8 +5,11 @@ import Haste.Graphics.Canvas
 -- | The state of our game.
 data GameState = GameState {
     manPacPos :: Point,
-    manPacDir :: Vector
+    manPacDir :: Vector,
+    wallBlocks :: [Wall]
   }
+
+type Wall = Rectangle
 
 -- Width and height of the playing field.
 width, height :: Double
@@ -51,6 +54,7 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
 initialState :: GameState
 initialState = GameState {
 	manPacPos = (width/2, height/2),
-    manPacDir = (0,0)
+    manPacDir = (0,0),
+    wallBlocks = []
 }
 
