@@ -41,7 +41,10 @@ inside (x, y) (Rect x1 y1 x2 y2) =
 -- Are the rectangles overlapping?
 overlaps :: Rect -> Rect -> Bool
 overlaps (Rect r1x1 r1y1 r1x2 r1y2) (Rect r2x1 r2y1 r2x2 r2y2) = 
-	r1x1 < r2x2 && r1x2 > r2x1 && r1y1 < r2y2 && r1y2 > r2y1
+	((r1x1 < (r2x1+r2x2)) &&
+		((r1x1+r1x2) > r2x1) &&
+		(r1y1 < (r2y1+r2y2)) &&
+		((r1y2+r1y2) > r2y1))
 
 -- | Update the ball's position with its velocity.
 moveManPac :: GameState -> GameState
@@ -69,7 +72,7 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
 
 invalidDir :: GameState -> Vector -> Bool
 invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
---	&& invalidDir'' ((manPacPos state) `move` (manPacDir state)) state
+	&& invalidDir'' ((manPacPos state) `move` (manPacDir state)) state
 
 invalidDir' :: Point -> Bool
 invalidDir' (x,y) = (x+manPacRadius) > width || (x-manPacRadius) < 0 
