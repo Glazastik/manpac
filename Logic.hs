@@ -65,4 +65,4 @@ initialState = GameState {
 }
 
 walls :: [Rect]
-walls = [Rect 150 (100 * p) 200 40 | p <- [1..4] ]
+walls = [Rect 0 (p*(manPacRadius*3)) 200 manPacRadius | p <- [0..4] ]
