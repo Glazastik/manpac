@@ -33,18 +33,18 @@ tick can keysRef state = do
     update keys state = moveManPac keys state
 
 main = do
-	canvasElem <- newCanvas width height
-	Just canvas <- getCanvas canvasElem
-	setChildren documentBody [canvasElem]
-	render canvas $ do manPac (height/2,width/2)
+  canvasElem <- newCanvas width height
+  Just canvas <- getCanvas canvasElem
+  setChildren documentBody [canvasElem]
+  render canvas $ do manPac (height/2,width/2)
 
-	keysPressed <- newIORef S.empty
-  	documentBody `onEvent` OnKeyDown $ \k -> do
-    	atomicModifyIORef keysPressed $ \keys -> (S.insert (chr k) keys, ())
-  	documentBody `onEvent` OnKeyUp $ \k -> do
-    	atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
+  keysPressed <- newIORef S.empty
+  documentBody `onEvent` OnKeyDown $ \k -> do
+    atomicModifyIORef keysPressed $ \keys -> (S.insert (chr k) keys, ())
+  documentBody `onEvent` OnKeyUp $ \k -> do
+    atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
 
-	tick canvas keysPressed initialState
+  tick canvas keysPressed initialState
 
 manPac :: Point -> Picture () 
 manPac pt = color (RGB 255 255 0) $ do
