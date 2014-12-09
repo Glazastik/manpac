@@ -6,7 +6,7 @@ import Haste.Graphics.Canvas
 data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
-    wallBlocks :: [Wall]
+    wallBlocks :: [Rect]
   }
 
 type Wall = Rect
@@ -61,6 +61,8 @@ initialState :: GameState
 initialState = GameState {
 	manPacPos = (width/2, height/2),
     manPacDir = (0,0),
-    wallBlocks = []
+    wallBlocks = walls
 }
 
+walls :: [Rect]
+walls = []
