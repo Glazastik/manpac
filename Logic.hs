@@ -30,19 +30,20 @@ clamp :: Point -> Rect -> Point
 clamp (x, y) (Rect xMin yMin xMax yMax) =
   (min (max x xMin) xMax, min (max y yMin) yMax)
 
+-- | Update the ball's position with its velocity.
+moveManPac :: GameState -> GameState
+moveManPac state = state {manPacPos = manPacPos state `move` manPacDir state}
+
 -- | Update the paddles depending on the currently pressed keys.
-moveManPac :: S.Set Char -> GameState -> GameState
-moveManPac keys state = state {
-      manPacPos  = movePac 'W' 'S' 'A' 'D' (manPacPos state) `clamp` playingField
-    }
+changeManPacDir :: S.Set Char -> GameState -> GameState
+changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D' 
   where
-    playingField = Rect 0 0 width height
-    movePac up down left right pac
-      | up `S.member` keys   = pac `move` (0, -manPacSpeed)
-      | down `S.member` keys = pac `move` (0, manPacSpeed)
-      | left `S.member` keys = pac `move` (-manPacSpeed, 0)
-      | right `S.member`keys = pac `move` (manPacSpeed, 0)
-      | otherwise            = pac
+    pacDir up down left right
+      | up `S.member` keys   = state { manPacDir = (0, -manPacSpeed) }
+      | down `S.member` keys = state { manPacDir = (0, manPacSpeed) }
+      | left `S.member` keys = state { manPacDir = (-manPacSpeed, 0) }
+      | right `S.member`keys = state { manPacDir = (manPacSpeed, 0) }
+      | otherwise            = state
 
 
 initialState :: GameState
