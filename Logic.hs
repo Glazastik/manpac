@@ -15,7 +15,7 @@ height = 500
 
 -- How big manPac is
 manPacRadius :: Double
-manPacRadius = 50
+manPacRadius = 15
 
 -- How fast is manPac
 manPacSpeed :: Double
@@ -50,3 +50,4 @@ initialState = GameState {
 	manPacPos = (width/2, height/2),
     manPacDir = (0,0)
 }
+

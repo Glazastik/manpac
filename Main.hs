@@ -18,3 +18,8 @@ main = do
 	canvasElem <- newCanvas width height
 	Just canvas <- getCanvas canvasElem
 	setChildren documentBody [canvasElem]
+	render canvas $ do manPac (height/2,width/2)
+
+manPac :: Point -> Picture () 
+manPac pt = color (RGB 255 255 0) $ do
+  fill $ circle pt manPacRadius
