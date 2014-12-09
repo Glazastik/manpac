@@ -13,8 +13,8 @@ type Wall = Rect
 
 -- Width and height of the playing field.
 width, height :: Double
-width  = 77 * manPacRadius
-height = 49 * manPacRadius
+width  = 32 * manPacRadius
+height = 27 * manPacRadius
 
 -- How big manPac is
 manPacRadius :: Double
@@ -89,9 +89,9 @@ initialState = GameState {
 }
 
 walls :: [Rect]
-walls = [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*2) (manPacRadius*13) manPacRadius | p <- [0..4] ]
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*5) manPacRadius (manPacRadius*17) | p <- [0..25] ] 
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*24) (manPacRadius*13) manPacRadius | p <- [0..4] ]
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*27) manPacRadius (manPacRadius*17) | p <- [0..25] ] 
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*46) (manPacRadius*13) manPacRadius | p <- [0..4] ]
+walls = [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*2) (manPacRadius*13) manPacRadius | p <- [0..1] ]
+		++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*5) manPacRadius (manPacRadius*17) | p <- [0..9] ] 
+		++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*24) (manPacRadius*13) manPacRadius | p <- [0..1] ]
+		-- ++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*27) manPacRadius (manPacRadius*17) | p <- [0..25] ] 
+		-- ++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*46) (manPacRadius*13) manPacRadius | p <- [0..4] ]
 
