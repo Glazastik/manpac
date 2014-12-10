@@ -16,12 +16,12 @@ type Wall = Rect
 
 -- Width and height of the playing field.
 width, height :: Double
-width  = 32 * manRad
-height = 27 * manRad
+width  = 30 * manRad
+height = 21 * manRad
 
 -- How big manPac is
 manRad :: Double
-manRad = 15
+manRad = 20
 
 -- How big pellets are
 pelletRad :: Double
@@ -98,7 +98,7 @@ invalidDir'' p state = or [overlaps (manPacBox p) x | x <- (wallBlocks state)]
 
 initialState :: GameState
 initialState = GameState {
-	manPacPos = (width/2, manRad*23),
+	manPacPos = (width/2, manRad*14),
     manPacDir = (0,0),
     wallBlocks = walls,
     pellets = [(manRad,manRad), (manRad*3, manRad), (manRad*5, manRad), (manRad*7, manRad), (manRad*9, manRad), (manRad*11, manRad), (manRad*13, manRad)],
@@ -106,9 +106,29 @@ initialState = GameState {
 }
 
 walls :: [Rect]
+walls = [Rect 0 0 (manRad*30) manRad]  ++ 
+		[Rect 0 0 manRad (manRad*18)]  ++
+		[Rect (manRad*29) 0 manRad (manRad*18)]  ++
+		[Rect 0 (manRad*18) (manRad*30) manRad]  ++
+
+		[Rect (manRad*14) (manRad*1) (manRad*2) (manRad*4) ] ++
+		[Rect (manRad*14) (manRad*7) (manRad*2) (manRad*4) ] ++
+		[Rect (manRad*12) (manRad*11) (manRad*6) (manRad*2) ] ++
+
+		[Rect (manRad*3) (manRad*3) (manRad*4) (manRad*2) ] ++
+		[Rect (manRad*9) (manRad*3) (manRad*3) (manRad*2) ] ++ 
+		[Rect (manRad*18) (manRad*3) (manRad*3) (manRad*2) ] ++
+		[Rect (manRad*23) (manRad*3) (manRad*4) (manRad*2) ] ++
+
+		[Rect (manRad*3) (manRad*7) (manRad*9) (manRad*2) ] ++
+		[Rect (manRad*5) (manRad*9) (manRad*2) (manRad*2) ] ++
+		[Rect (manRad*18) (manRad*7) (manRad*9) (manRad*2) ] ++
+		[Rect (manRad*23) (manRad*9) (manRad*2) (manRad*2) ] 
+{-
+walls :: [Rect]
 walls = [Rect (manRad*2 + p*(manRad*15)) (manRad*2) (manRad*13) manRad | p <- [0..1] ]
 		++ [Rect (manRad*2 + p*(manRad*3)) (manRad*5) manRad (manRad*17) | p <- [0..9] ] 
 		++ [Rect (manRad*2 + p*(manRad*15)) (manRad*24) (manRad*13) manRad | p <- [0..1] ]
 		-- ++ [Rect (manRad*2 + p*(manRad*3)) (manRad*27) manRad (manRad*17) | p <- [0..25] ] 
 		-- ++ [Rect (manRad*2 + p*(manRad*15)) (manRad*46) (manRad*13) manRad | p <- [0..4] ]
-
+-}
