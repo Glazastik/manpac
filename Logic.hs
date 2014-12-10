@@ -7,6 +7,8 @@ data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
     wallBlocks :: [Rect]
+    pellets :: [Point]
+    score :: Int
   }
 
 type Wall = Rect
@@ -70,6 +72,9 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
       | (right `S.member`keys) && invalidDir state (manPacSpeed, 0)  = state { manPacDir = (manPacSpeed, 0)  }
       | otherwise            = state
 
+pelletCollide :: GameState -> GameState
+pelletCollide state = [p `inside` (manPacPos state)]
+
 invalidDir :: GameState -> Vector -> Bool
 invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
 	|| invalidDir'' ((manPacPos state) `move` v) state
@@ -86,6 +91,8 @@ initialState = GameState {
 	manPacPos = (width/2, manRad*23),
     manPacDir = (0,0),
     wallBlocks = walls
+    pellets = [(0,0)]
+    score = 0
 }
 
 walls :: [Rect]
