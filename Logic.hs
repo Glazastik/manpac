@@ -17,7 +17,7 @@ type Wall = Rect
 -- Width and height of the playing field.
 width, height :: Double
 width  = 30 * manRad
-height = 21 * manRad
+height = 22 * manRad
 
 -- How big manPac is
 manRad :: Double
@@ -106,24 +106,43 @@ initialState = GameState {
 }
 
 walls :: [Rect]
-walls = [Rect 0 0 (manRad*30) manRad]  ++ 
-		[Rect 0 0 manRad (manRad*18)]  ++
-		[Rect (manRad*29) 0 manRad (manRad*18)]  ++
-		[Rect 0 (manRad*18) (manRad*30) manRad]  ++
+walls = -- the outer walls
+		[Rect 0 0 (manRad*30) manRad]  ++ 
+		[Rect 0 0 manRad (manRad*19)]  ++
+		[Rect (manRad*29) 0 manRad (manRad*19)]  ++
+		[Rect 0 (manRad*19) (manRad*30) manRad]  ++
 
+		-- The middle upside down T
 		[Rect (manRad*14) (manRad*1) (manRad*2) (manRad*4) ] ++
 		[Rect (manRad*14) (manRad*7) (manRad*2) (manRad*4) ] ++
 		[Rect (manRad*12) (manRad*11) (manRad*6) (manRad*2) ] ++
 
+		-- the top most "dots"
 		[Rect (manRad*3) (manRad*3) (manRad*4) (manRad*2) ] ++
 		[Rect (manRad*9) (manRad*3) (manRad*3) (manRad*2) ] ++ 
 		[Rect (manRad*18) (manRad*3) (manRad*3) (manRad*2) ] ++
 		[Rect (manRad*23) (manRad*3) (manRad*4) (manRad*2) ] ++
 
+		-- The cross-like near the middle
 		[Rect (manRad*3) (manRad*7) (manRad*9) (manRad*2) ] ++
-		[Rect (manRad*5) (manRad*9) (manRad*2) (manRad*2) ] ++
+		[Rect (manRad*8) (manRad*9) (manRad*2) (manRad*2) ] ++
 		[Rect (manRad*18) (manRad*7) (manRad*9) (manRad*2) ] ++
-		[Rect (manRad*23) (manRad*9) (manRad*2) (manRad*2) ] 
+		[Rect (manRad*20) (manRad*9) (manRad*2) (manRad*2) ] ++
+
+		-- middle sideways bars
+		[Rect (manRad*1) (manRad*11) (manRad*5) (manRad*2) ] ++
+		[Rect (manRad*24) (manRad*11) (manRad*5) (manRad*2) ] ++
+
+		-- the Ls laying down
+		[Rect (manRad*8) (manRad*13) (manRad*2) (manRad*2) ] ++
+		[Rect (manRad*3) (manRad*15) (manRad*7) (manRad*2) ] ++
+		[Rect (manRad*20) (manRad*13) (manRad*2) (manRad*2) ] ++
+		[Rect (manRad*20) (manRad*15) (manRad*7) (manRad*2) ] ++
+
+		-- "ghost cage"
+		[Rect (manRad*12) (manRad*15) (manRad*6) (manRad*1) ] ++
+		[Rect (manRad*12) (manRad*16) (manRad*1) (manRad*4) ] ++ 
+		[Rect (manRad*17) (manRad*16) (manRad*1) (manRad*4) ]
 {-
 walls :: [Rect]
 walls = [Rect (manRad*2 + p*(manRad*15)) (manRad*2) (manRad*13) manRad | p <- [0..1] ]
