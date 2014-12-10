@@ -13,16 +13,16 @@ type Wall = Rect
 
 -- Width and height of the playing field.
 width, height :: Double
-width  = 32 * manPacRadius
-height = 27 * manPacRadius
+width  = 32 * manRad
+height = 27 * manRad
 
 -- How big manPac is
-manPacRadius :: Double
-manPacRadius = 15
+manRad :: Double
+manRad = 15
 
 -- How fast is manPac
 manPacSpeed :: Double
-manPacSpeed = manPacRadius / 4
+manPacSpeed = manRad / 4
 
 -- | Move a point by a certain velocity.
 move :: Point -> Vector -> Point
@@ -52,12 +52,12 @@ moveManPac state = case or [overlaps (manPacBox p) x | x <- (wallBlocks state)] 
 						True  -> state {manPacDir = (0,0)}
 						False -> state {manPacPos = p}
  where
-    playingField = Rect manPacRadius manPacRadius (width - manPacRadius) (height - manPacRadius)
+    playingField = Rect manRad manRad (width - manRad) (height - manRad)
     p = ((manPacPos state) `move` (manPacDir state)) `clamp` playingField
 
 manPacBox :: Point -> Rect
 manPacBox (px,py) = Rect (px - r) (py - r) (r * 2) (r * 2)
-	where r = manPacRadius
+	where r = manRad
 
 -- | Update the paddles depending on the currently pressed keys.
 changeManPacDir :: S.Set Char -> GameState -> GameState
@@ -75,23 +75,23 @@ invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v)
 	|| invalidDir'' ((manPacPos state) `move` v) state
 
 invalidDir' :: Point -> Bool
-invalidDir' (x,y) = (x+manPacRadius) > width || (x-manPacRadius) < 0 
-					|| (y+manPacRadius) > height || (y-manPacRadius) < 0
+invalidDir' (x,y) = (x+manRad) > width || (x-manRad) < 0 
+					|| (y+manRad) > height || (y-manRad) < 0
 
 invalidDir'' :: Point -> GameState -> Bool
 invalidDir'' p state = or [overlaps (manPacBox p) x | x <- (wallBlocks state)]
 
 initialState :: GameState
 initialState = GameState {
-	manPacPos = (width/2, manPacRadius*23),
+	manPacPos = (width/2, manRad*23),
     manPacDir = (0,0),
     wallBlocks = walls
 }
 
 walls :: [Rect]
-walls = [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*2) (manPacRadius*13) manPacRadius | p <- [0..1] ]
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*5) manPacRadius (manPacRadius*17) | p <- [0..9] ] 
-		++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*24) (manPacRadius*13) manPacRadius | p <- [0..1] ]
-		-- ++ [Rect (manPacRadius*2 + p*(manPacRadius*3)) (manPacRadius*27) manPacRadius (manPacRadius*17) | p <- [0..25] ] 
-		-- ++ [Rect (manPacRadius*2 + p*(manPacRadius*15)) (manPacRadius*46) (manPacRadius*13) manPacRadius | p <- [0..4] ]
+walls = [Rect (manRad*2 + p*(manRad*15)) (manRad*2) (manRad*13) manRad | p <- [0..1] ]
+		++ [Rect (manRad*2 + p*(manRad*3)) (manRad*5) manRad (manRad*17) | p <- [0..9] ] 
+		++ [Rect (manRad*2 + p*(manRad*15)) (manRad*24) (manRad*13) manRad | p <- [0..1] ]
+		-- ++ [Rect (manRad*2 + p*(manRad*3)) (manRad*27) manRad (manRad*17) | p <- [0..25] ] 
+		-- ++ [Rect (manRad*2 + p*(manRad*15)) (manRad*46) (manRad*13) manRad | p <- [0..4] ]
 

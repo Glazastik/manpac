@@ -49,7 +49,7 @@ main = do
 
 manPac :: Point -> Picture () 
 manPac pt = color (RGB 255 255 0) $ do
-  fill $ circle pt manPacRadius
+  fill $ circle pt manRad
 
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
