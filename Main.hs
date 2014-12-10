@@ -29,15 +29,30 @@ tick :: Canvas -> IORef (S.Set Char) -> GameState -> IO ()
 tick can keysRef state = do
     keys <- readIORef keysRef
     let state' = update keys state
+    setScore (score state)
     renderState can state'
     setTimeout 30 $ tick can keysRef state'
   where
     update keys = pelletCollide . moveManPac . changeManPacDir keys
 
+-- | Create a new scoreboard.
+newScoreboard :: IO Elem
+newScoreboard = do
+  scoreboard <- newElem "div"
+  setStyle scoreboard "margin" "auto"
+  setStyle scoreboard "width" "150px"
+
+  score <- newElem "div"
+  setProp score "id" ("Score")
+
+  setChildren scoreboard [score]
+  return scoreboard
+
 main = do
   canvasElem <- newCanvas width height
   Just canvas <- getCanvas canvasElem
-  setChildren documentBody [canvasElem]
+  scoreboard <- newScoreboard
+  setChildren documentBody [canvasElem, scoreboard]
   render canvas $ do manPac (height/2,width/2)
 
   keysPressed <- newIORef S.empty
@@ -46,7 +61,14 @@ main = do
   documentBody `onEvent` OnKeyUp $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
 
+  setScore 0
+
   tick canvas keysPressed initialState
+
+-- Update the scoreboard.
+setScore :: Int -> IO ()
+setScore score = withElem ("Score") $ \e -> do
+  setProp e "innerText" ("score: " ++ show score)
 
 manPac :: Point -> Picture () 
 manPac pt = color (RGB 255 255 0) $ do
