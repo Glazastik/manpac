@@ -23,6 +23,10 @@ height = 27 * manRad
 manRad :: Double
 manRad = 15
 
+-- How big pellets are
+pelletRad :: Double
+pelletRad = manRad/5
+
 -- How fast is manPac
 manPacSpeed :: Double
 manPacSpeed = manRad / 4
@@ -78,7 +82,7 @@ pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (manP
 
 pelletCollide' :: [Point] -> GameState -> GameState
 pelletCollide' [] state = state 
-pelletCollide' (x:xs) state = state { pellets = delete x (pellets state), 
+pelletCollide' [x] state = state { pellets = delete x (pellets state), 
 									  score = (score state) + 1 } 
 
 invalidDir :: GameState -> Vector -> Bool
@@ -97,7 +101,7 @@ initialState = GameState {
 	manPacPos = (width/2, manRad*23),
     manPacDir = (0,0),
     wallBlocks = walls,
-    pellets = [(0,0)],
+    pellets = [(manRad,manRad), (manRad*3, manRad), (manRad*5, manRad), (manRad*7, manRad), (manRad*9, manRad), (manRad*11, manRad), (manRad*13, manRad)],
     score = 0
 }
 

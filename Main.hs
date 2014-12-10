@@ -10,6 +10,7 @@ renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	manPac (manPacPos state)
 	mapM_ wallPic $ (wallBlocks state) 
+	mapM_ pellet $ (pellets state)
 
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
@@ -31,7 +32,7 @@ tick can keysRef state = do
     renderState can state'
     setTimeout 30 $ tick can keysRef state'
   where
-    update keys = moveManPac . changeManPacDir keys
+    update keys = pelletCollide . moveManPac . changeManPacDir keys
 
 main = do
   canvasElem <- newCanvas width height
@@ -54,3 +55,7 @@ manPac pt = color (RGB 255 255 0) $ do
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
   fill $ rect (x1,y1) (x1+x2,y1+y2) 
+
+pellet :: Point -> Picture ()
+pellet pt = color (RGB 255 255 255) $ do
+	fill $ circle pt pelletRad
