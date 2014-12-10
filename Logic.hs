@@ -1,13 +1,14 @@
 module Logic where
 import qualified Data.Set as S
+import Data.List
 import Haste.Graphics.Canvas
 
 -- | The state of our game.
 data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
-    wallBlocks :: [Rect]
-    pellets :: [Point]
+    wallBlocks :: [Rect],
+    pellets :: [Point],
     score :: Int
   }
 
@@ -61,7 +62,7 @@ manPacBox :: Point -> Rect
 manPacBox (px,py) = Rect (px - r) (py - r) (r * 2) (r * 2)
 	where r = manRad
 
--- | Update the paddles depending on the currently pressed keys.
+-- | Updates pacman direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
 changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D' 
   where
@@ -73,7 +74,12 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
       | otherwise            = state
 
 pelletCollide :: GameState -> GameState
-pelletCollide state = [p `inside` (manPacPos state)]
+pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (manPacBox (manPacPos state))] state
+
+pelletCollide' :: [Point] -> GameState -> GameState
+pelletCollide' [] state = state 
+pelletCollide' (x:xs) state = state { pellets = delete x (pellets state), 
+									  score = (score state) + 1 } 
 
 invalidDir :: GameState -> Vector -> Bool
 invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
@@ -90,8 +96,8 @@ initialState :: GameState
 initialState = GameState {
 	manPacPos = (width/2, manRad*23),
     manPacDir = (0,0),
-    wallBlocks = walls
-    pellets = [(0,0)]
+    wallBlocks = walls,
+    pellets = [(0,0)],
     score = 0
 }
 
