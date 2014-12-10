@@ -40,11 +40,11 @@ inside (x, y) (Rect x1 y1 x2 y2) =
 
 -- Are the rectangles overlapping?
 overlaps :: Rect -> Rect -> Bool
-overlaps (Rect r1x1 r1y1 r1x2 r1y2) (Rect r2x1 r2y1 r2x2 r2y2) = 
-	((r1x1 < (r2x1+r2x2)) &&
-		((r1x1+r1x2) > r2x1) &&
-		(r1y1 < (r2y1+r2y2)) &&
-		((r1y2+r1y2) > r2y1))
+overlaps (Rect r1x1 r1y1 r1w r1l) (Rect r2x1 r2y1 r2w r2l) = 
+	((r1x1 < (r2x1+r2w)) &&
+		((r1x1+r1w) > r2x1) &&
+		(r1y1 < (r2y1+r2l)) &&
+		((r1y1+r1l) > r2y1))
 
 -- | Update the ball's position with its velocity.
 moveManPac :: GameState -> GameState
