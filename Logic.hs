@@ -43,7 +43,7 @@ clamp (x, y) (Rect xMin yMin xMax yMax) =
 -- | Is the point inside the rectangle?
 inside :: Point -> Rect -> Bool
 inside (x, y) (Rect x1 y1 x2 y2) =
-  x >= x1 && x <= x2 && y >= y1 && y <= y2
+  x >= x1 && x <= (x1+x2) && y >= y1 && y <= (y1+y2)
 
 -- Are the rectangles overlapping?
 overlaps :: Rect -> Rect -> Bool
@@ -82,8 +82,8 @@ pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (manP
 
 pelletCollide' :: [Point] -> GameState -> GameState
 pelletCollide' [] state = state 
-pelletCollide' [x] state = state { pellets = delete x (pellets state), 
-									  score = (score state) + 1 } 
+pelletCollide' (x:xs) state = pelletCollide' xs state { pellets = delete x (pellets state), 
+									  score = (score state) + 1 }  
 
 invalidDir :: GameState -> Vector -> Bool
 invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
@@ -101,9 +101,13 @@ initialState = GameState {
 	manPacPos = (width/2, manRad*14),
     manPacDir = (0,0),
     wallBlocks = walls,
-    pellets = [(manRad,manRad), (manRad*3, manRad), (manRad*5, manRad), (manRad*7, manRad), (manRad*9, manRad), (manRad*11, manRad), (manRad*13, manRad)],
+    pellets = pelletsInit,
     score = 0
 }
+
+pelletsInit :: [Point]
+pelletsInit = [(manRad*2,manRad*2), (manRad*3, manRad*2), (manRad*4, manRad*2), (manRad*5, manRad*2), (manRad*6, manRad*2), (manRad*7, manRad*2), (manRad*8, manRad*2),
+     (manRad*9, manRad*2), (manRad*10, manRad*2), (manRad*11, manRad*2), (manRad*12, manRad*2), (manRad*13, manRad*2)]
 
 walls :: [Rect]
 walls = -- the outer walls
