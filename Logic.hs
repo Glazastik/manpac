@@ -97,7 +97,7 @@ invalidDir'' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks 
 
 initialState :: GameState
 initialState = GameState {
-	manPacPos = (width/2, manRad*14),
+	manPacPos = (width/2, manRad*6),
     manPacDir = (0,0),
     wallBlocks = walls,
     pellets = pelletsInit,
@@ -105,8 +105,32 @@ initialState = GameState {
 }
 
 pelletsInit :: [Point]
-pelletsInit = [(manRad*2,manRad*2), (manRad*3, manRad*2), (manRad*4, manRad*2), (manRad*5, manRad*2), (manRad*6, manRad*2), (manRad*7, manRad*2), (manRad*8, manRad*2),
-     (manRad*9, manRad*2), (manRad*10, manRad*2), (manRad*11, manRad*2), (manRad*12, manRad*2), (manRad*13, manRad*2)]
+pelletsInit = --Top row
+			  [(manRad*(p+2),manRad*2) | p <- [1..10]] ++ [(manRad*(p+17),manRad*2) | p <- [1..10]] ++
+			  --Second row
+			  [(manRad*(p+2),manRad*6) | p <- [1..10]] ++ [(manRad*(p+17),manRad*6) | p <- [1..10]]	++
+			  --Inner columns
+			  [(manRad*13,manRad*(p+1)) | p <- [1..8]] ++ [(manRad*17,manRad*(p+1)) | p <- [1..8]]	++
+			  --Inner lower column
+			  [(manRad*11,manRad*(p+10)) | p <- [1..8]] ++ [(manRad*19,manRad*(p+10)) | p <- [1..8]]	++
+			  --Long outer columns
+			  [(manRad*2,manRad*(p+1)) | p <- [1..9]] ++ [(manRad*28,manRad*(p+1)) | p <- [1..9]]	++
+			  --Short outer columns
+			  [(manRad*2,manRad*(p+13)) | p <- [1..5]] ++ [(manRad*28,manRad*(p+13)) | p <- [1..5]]	++
+			  --Small fill columns
+			  [(manRad*8,manRad*(p+2)) | p <- [1..3]] ++ [(manRad*22,manRad*(p+2)) | p <- [1..3]]	++
+			  --Lower Small fill columns
+			  [(manRad*7,manRad*(p+9)) | p <- [1..5]] ++ [(manRad*23,manRad*(p+9)) | p <- [1..5]]	++
+			  --Short third row
+			  [(manRad*(p+2),manRad*10) | p <- [1..4]] ++ [(manRad*(p+23),manRad*10) | p <- [1..4]] ++
+			  --Short fill row
+			  [(manRad*(p+10),manRad*10) | p <- [1..3]] ++ [(manRad*(p+16),manRad*10) | p <- [1..3]] ++
+			  --Short centered fourth row
+			  [(manRad*(p+7),manRad*12) | p <- [1..3]] ++ [(manRad*(p+19),manRad*12) | p <- [1..3]] ++  
+			  --Short fifth row
+			  [(manRad*(p+2),manRad*14) | p <- [1..4]] ++ [(manRad*(p+23),manRad*14) | p <- [1..4]] ++
+			  --Long bottom row
+			  [(manRad*(p+2),manRad*18) | p <- [1..8]] ++ [(manRad*(p+19),manRad*18) | p <- [1..8]]
 
 walls :: [Rect]
 walls = -- the outer walls
