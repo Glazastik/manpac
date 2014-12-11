@@ -135,7 +135,8 @@ pelletsInit = --Top row
 walls :: [Rect]
 walls = -- the outer walls
 		[Rect 0 0 (manRad*30) manRad]  ++ 
-		[Rect 0 0 manRad (manRad*19)]  ++
+		[Rect 0 0 manRad (manRad*9)]  ++
+		[Rect 0 (manRad*11) manRad (manRad*8)]  ++
 		[Rect (manRad*29) 0 manRad (manRad*19)]  ++
 		[Rect 0 (manRad*19) (manRad*30) manRad]  ++
 
