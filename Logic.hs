@@ -55,16 +55,15 @@ overlaps (Rect r1x1 r1y1 r1w r1l) (Rect r2x1 r2y1 r2w r2l) =
 
 -- | Update the ball's position with its velocity.
 moveManPac :: GameState -> GameState
-moveManPac state = case or [overlaps (manPacBox p) x | x <- (wallBlocks state)] of
+moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
 						True  -> state {manPacDir = (0,0)}
 						False -> state {manPacPos = p}
  where
     playingField = Rect manRad manRad (width - manRad) (height - manRad)
     p = ((manPacPos state) `move` (manPacDir state)) `clamp` playingField
 
-manPacBox :: Point -> Rect
-manPacBox (px,py) = Rect (px - r) (py - r) (r * 2) (r * 2)
-	where r = manRad
+circleToBox :: Point -> Double -> Rect
+circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
 
 -- | Updates pacman direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
@@ -78,7 +77,7 @@ changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D'
       | otherwise            = state
 
 pelletCollide :: GameState -> GameState
-pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (manPacBox (manPacPos state))] state
+pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (circleToBox (manPacPos state) (manRad/2))] state
 
 pelletCollide' :: [Point] -> GameState -> GameState
 pelletCollide' [] state = state 
@@ -94,7 +93,7 @@ invalidDir' (x,y) = (x+manRad) > width || (x-manRad) < 0
 					|| (y+manRad) > height || (y-manRad) < 0
 
 invalidDir'' :: Point -> GameState -> Bool
-invalidDir'' p state = or [overlaps (manPacBox p) x | x <- (wallBlocks state)]
+invalidDir'' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
 
 initialState :: GameState
 initialState = GameState {
