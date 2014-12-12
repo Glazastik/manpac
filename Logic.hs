@@ -59,8 +59,7 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
 						True  -> state {manPacDir = (0,0)}
 						False -> state {manPacPos = p}
  where
-    playingField = Rect manRad manRad (width - manRad) (height - manRad)
-    p = ((manPacPos state) `move` (manPacDir state)) `clamp` playingField
+    p = ((manPacPos state) `move` (manPacDir state))
 
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
@@ -84,16 +83,24 @@ pelletCollide' [] state = state
 pelletCollide' (x:xs) state = pelletCollide' xs state { pellets = delete x (pellets state), 
 									  score = (score state) + 1 }  
 
-invalidDir :: GameState -> Vector -> Bool
-invalidDir state v = not $ invalidDir' ((manPacPos state) `move` v) 
-	|| invalidDir'' ((manPacPos state) `move` v) state
+checkBounding :: GameState -> GameState
+checkBounding state = state { manPacPos = (manPacPos (oOB (manPacPos state) state)) }
+	where 
+		oOB :: Point -> GameState -> GameState
+		oOB (x,y) state
+			| x > width = state { manPacPos = (0,y) }
+			| x < 0	    = state { manPacPos = (width, y) } 
+			| otherwise = state
 
-invalidDir' :: Point -> Bool
-invalidDir' (x,y) = (x+manRad) > width || (x-manRad) < 0 
-					|| (y+manRad) > height || (y-manRad) < 0
+invalidDir :: GameState -> Vector -> Bool
+invalidDir state v = not $ invalidDir'' ((manPacPos state) `move` v) state
 
 invalidDir'' :: Point -> GameState -> Bool
 invalidDir'' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
+
+outOfBounds :: Point -> Bool
+outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0 
+					|| (y+manRad) > height || (y-manRad) < 0
 
 initialState :: GameState
 initialState = GameState {
