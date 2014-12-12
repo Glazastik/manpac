@@ -9,6 +9,7 @@ import Logic
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	manPac (manPacPos state)
+	ghostPic (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
 
@@ -16,7 +17,7 @@ renderState can state = render can $ do
 newCanvas :: Double -> Double -> IO Elem
 newCanvas w h = do
 	canvas <- newElem "canvas"
-	setStyle canvas "border" "2px solid blue"
+	setStyle canvas "border" "2px solid black"
 	setStyle canvas "display" "block"
 	setStyle canvas "margin" "auto"
 	setStyle canvas "background-color" "black"
@@ -72,7 +73,11 @@ setScore score = withElem ("Score") $ \e -> do
 
 manPac :: Point -> Picture () 
 manPac pt = color (RGB 255 255 0) $ do
-  fill $ circle pt manRad
+  fill $ circle pt manRad 
+
+ghostPic :: Point -> Picture ()
+ghostPic pt = color (RGB 0 0 255) $ do 
+	fill $ circle pt manRad
 
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do

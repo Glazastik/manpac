@@ -7,6 +7,7 @@ import Haste.Graphics.Canvas
 data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
+    ghostPos :: Point,
     wallBlocks :: [Rect],
     pellets :: [Point],
     score :: Int
@@ -59,19 +60,33 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
  where
     p = ((manPacPos state) `move` (manPacDir state))
 
+moveGhost :: GameState -> GameState
+moveGhost state = state { ghostPos = newPos }
+	where 
+		keys = S.insert 'D' (S.insert 'W' keys)
+		newPos = ((ghostPos state) `move` (0, -manPacSpeed)) -- moveDir state keys (ghostPos state) 'W' 'S' 'A' 'D')
+
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
 
 -- | Updates pacman direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
-changeManPacDir keys state = pacDir 'W' 'S' 'A' 'D' 
+changeManPacDir keys state = state { manPacDir = (pacDir 'W' 'S' 'A' 'D') }
   where
     pacDir up down left right
-      | (up `S.member` keys)   && invalidDir state (0, -manPacSpeed) = state { manPacDir = (0, -manPacSpeed) }
-      | (down `S.member` keys) && invalidDir state (0, manPacSpeed)  = state { manPacDir = (0, manPacSpeed)  }
-      | (left `S.member` keys) && invalidDir state (-manPacSpeed, 0) = state { manPacDir = (-manPacSpeed, 0) }
-      | (right `S.member`keys) && invalidDir state (manPacSpeed, 0)  = state { manPacDir = (manPacSpeed, 0)  }
-      | otherwise            = state
+      | (up `S.member` keys)   && invalidDir state (manPacPos state) (0, -manPacSpeed) = (0, -manPacSpeed)
+      | (down `S.member` keys) && invalidDir state (manPacPos state) (0, manPacSpeed)  = (0, manPacSpeed)
+      | (left `S.member` keys) && invalidDir state (manPacPos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
+      | (right `S.member`keys) && invalidDir state (manPacPos state) (manPacSpeed, 0)  = (manPacSpeed, 0)
+      | otherwise            = (manPacDir state)
+
+moveDir state keys pos up down left right
+	| (up `S.member` keys)   && invalidDir state pos (0, -manPacSpeed) = (0, -manPacSpeed) 
+    | (down `S.member` keys) && invalidDir state pos (0, manPacSpeed)  = (0, manPacSpeed)  
+    | (left `S.member` keys) && invalidDir state pos (-manPacSpeed, 0) = (-manPacSpeed, 0) 
+    | (right `S.member`keys) && invalidDir state pos (manPacSpeed, 0)  = (manPacSpeed, 0)  
+    | otherwise            = (0,0)
+
 
 pelletCollide :: GameState -> GameState
 pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (circleToBox (manPacPos state) (manRad/2))] state
@@ -90,11 +105,11 @@ checkBounding state = state { manPacPos = (manPacPos (oOB (manPacPos state) stat
 			| x < 0	    = state { manPacPos = (width, y) } 
 			| otherwise = state
 
-invalidDir :: GameState -> Vector -> Bool
-invalidDir state v = not $ invalidDir'' ((manPacPos state) `move` v) state
+invalidDir :: GameState -> Point -> Vector -> Bool
+invalidDir state pos v = not $ invalidDir' (pos `move` v) state
 
-invalidDir'' :: Point -> GameState -> Bool
-invalidDir'' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
+invalidDir' :: Point -> GameState -> Bool
+invalidDir' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
 
 outOfBounds :: Point -> Bool
 outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0 
@@ -104,6 +119,7 @@ initialState :: GameState
 initialState = GameState {
 	manPacPos = (width/2, manRad*6),
     manPacDir = (0,0),
+    ghostPos = (width/2, manRad*18),
     wallBlocks = walls,
     pellets = pelletsInit,
     score = 0
