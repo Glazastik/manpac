@@ -12,8 +12,6 @@ data GameState = GameState {
     score :: Int
   }
 
-type Wall = Rect
-
 -- Width and height of the playing field.
 width, height :: Double
 width  = 30 * manRad
