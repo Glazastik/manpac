@@ -29,6 +29,15 @@ tick can keysRef state = do
     update keys = incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 
 
+-- | Render the game's state to a canvas.
+renderState :: Canvas -> GameState -> IO ()
+renderState can state = render can $ do
+	ghostPic (tilemap state) (ghostPos state)
+	mapM_ wallPic $ (wallBlocks state) 
+	mapM_ pellet $ (pellets state)
+	--drawTile (tilemap state) (1,0) (manPacPos state)
+	animatePac (tilemap state) (manPacPos state) (activeA state)
+
 -- | Create a new scoreboard.
 newScoreboard :: IO Elem
 newScoreboard = do
@@ -87,15 +96,6 @@ drawImg img c pt = do
   render c $ scale (1,1) $ do
   	draw img pt
 
--- | Render the game's state to a canvas.
-renderState :: Canvas -> GameState -> IO ()
-renderState can state = render can $ do
-	--manPac (manPacPos state)
-	mapM_ wallPic $ (wallBlocks state) 
-	mapM_ pellet $ (pellets state)
-	ghostPic (ghostPos state)
-	--drawTile (tilemap state) (1,0) (manPacPos state)
-	animatePac (tilemap state) (manPacPos state) (activeA state)
 	
 
 animate :: Tilemap -> Point -> Animation -> Picture ()
@@ -131,9 +131,8 @@ manPac :: Point -> Picture ()
 manPac pt = color (RGB 255 255 0) $ do
   fill $ circle pt manRad 
 
-ghostPic :: Point -> Picture ()
-ghostPic pt = color (RGB 0 0 255) $ do 
-	fill $ circle pt manRad
+ghostPic :: Tilemap -> Point -> Picture ()
+ghostPic tmap pt = drawTile tmap (0,1) pt
 
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
