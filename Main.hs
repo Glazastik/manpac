@@ -24,7 +24,9 @@ tick can keysRef state = do
     let state' = update keys state
     setScore (score state)
     renderState can state'
-    setTimeout 30 $ tick can keysRef state'
+    case gameOver state of
+      True -> main
+      False -> setTimeout 30 $ tick can keysRef state'
   where
     update keys = incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 

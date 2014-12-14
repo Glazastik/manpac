@@ -145,6 +145,10 @@ outOfBounds :: Point -> Bool
 outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0 
 					|| (y+manRad) > height || (y-manRad) < 0
 
+gameOver :: GameState -> Bool
+gameOver state = ((circleToBox (ghostPos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || (pellets state) == []
+
+
 initialState :: Tilemap -> [Animation] -> GameState
 initialState tile anims = GameState {
 	manPacPos = (width/2, manRad*6),
