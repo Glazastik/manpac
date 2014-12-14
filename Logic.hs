@@ -76,9 +76,15 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
 
 moveGhost :: GameState -> GameState
 moveGhost state = state { ghostPos = newPos }
-	where 
-		keys = S.insert 'D' (S.insert 'W' keys)
-		newPos = ((ghostPos state) `move` (0, -manPacSpeed)) -- moveDir state keys (ghostPos state) 'W' 'S' 'A' 'D')
+  where 
+    keys = S.insert 'D' -- (S.insert 'W' keys)
+    newPos = ((ghostPos state) `move` moveDir (ghostPos state) 'W' 'S' 'A' 'D')
+    moveDir pos up down left right
+      | (up `S.member` keys)   && invalidDir state pos (0, -manPacSpeed) = (0, -manPacSpeed) 
+      | (down `S.member` keys) && invalidDir state pos (0, manPacSpeed)  = (0, manPacSpeed)  
+      | (left `S.member` keys) && invalidDir state pos (-manPacSpeed, 0) = (-manPacSpeed, 0) 
+      | (right `S.member`keys) && invalidDir state pos (manPacSpeed, 0)  = (manPacSpeed, 0)  
+      | otherwise            = (0,0)
 
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
@@ -93,13 +99,6 @@ changeManPacDir keys state = state { manPacDir = (pacDir 'W' 'S' 'A' 'D') }
       | (left `S.member` keys) && invalidDir state (manPacPos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
       | (right `S.member`keys) && invalidDir state (manPacPos state) (manPacSpeed, 0)  = (manPacSpeed, 0)
       | otherwise            = (manPacDir state)
-
-moveDir state keys pos up down left right
-	| (up `S.member` keys)   && invalidDir state pos (0, -manPacSpeed) = (0, -manPacSpeed) 
-    | (down `S.member` keys) && invalidDir state pos (0, manPacSpeed)  = (0, manPacSpeed)  
-    | (left `S.member` keys) && invalidDir state pos (-manPacSpeed, 0) = (-manPacSpeed, 0) 
-    | (right `S.member`keys) && invalidDir state pos (manPacSpeed, 0)  = (manPacSpeed, 0)  
-    | otherwise            = (0,0)
 
 
 pelletCollide :: GameState -> GameState
