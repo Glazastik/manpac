@@ -77,7 +77,7 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
 moveGhost :: GameState -> GameState
 moveGhost state = state { ghostPos = newPos }
   where 
-    keys = S.insert 'D' -- (S.insert 'W' keys)
+    keys = S.insert 'D' keys -- (S.insert 'W' keys)
     newPos = ((ghostPos state) `move` moveDir (ghostPos state) 'W' 'S' 'A' 'D')
     moveDir pos up down left right
       | (up `S.member` keys)   && invalidDir state pos (0, -manPacSpeed) = (0, -manPacSpeed) 
