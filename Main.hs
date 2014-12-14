@@ -106,7 +106,7 @@ initialize c k tmap = tick c k $ initialState tmap (pacAnimations tmap)
 pacAnimations :: Tilemap -> [Animation]
 pacAnimations tilemap = [Animation {
 	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [3,2,1,0] ],
-	timing = [10,20,30,40],
+	timing = [ i*1 | i <- [1..4]],
 	counter = 0
 }, Animation {
 	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [6,5,4,0] ],
