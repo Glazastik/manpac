@@ -82,7 +82,17 @@ pacAnimations tilemap = [Animation {
 	counter = 0
 }, Animation {
 	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [6,5,4,0] ],
-	timing = [250,500,750,1000],
+	timing = [ i*1 | i <- [1..4]],
+	counter = 0
+}, Animation {
+	tiles = [(Rect (x * (mapW tilemap)) (mapH tilemap) (mapW tilemap) (mapH tilemap)) | x <- [3,2,1] ]
+		++ [(Rect 0 0 (mapW tilemap) (mapH tilemap))],
+	timing = [ i*1 | i <- [1..4]],
+	counter = 0
+}, Animation {
+	tiles = [(Rect (x * (mapW tilemap))  (mapH tilemap) (mapW tilemap) (mapH tilemap)) | x <- [6,5,4] ]
+	++ [(Rect 0 0 (mapW tilemap) (mapH tilemap))],
+	timing = [ i*1 | i <- [1..4]],
 	counter = 0
 }]
 

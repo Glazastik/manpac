@@ -108,15 +108,20 @@ incAnim state | (manPacDir state) == (0,0) = state {activeA = (activeA state) {c
 
 -- | Updates pacman direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
-changeManPacDir keys state = state { manPacDir = (pacDir 'W' 'S' 'A' 'D') }
+changeManPacDir keys state = (pacDir 'W' 'S' 'A' 'D')
   where
     pacDir up down left right
-      | (up `S.member` keys)   && invalidDir state (manPacPos state) (0, -manPacSpeed) = (0, -manPacSpeed)
-      | (down `S.member` keys) && invalidDir state (manPacPos state) (0, manPacSpeed)  = (0, manPacSpeed)
-      | (left `S.member` keys) && invalidDir state (manPacPos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
-      | (right `S.member`keys) && invalidDir state (manPacPos state) (manPacSpeed, 0)  = (manPacSpeed, 0)
-      | otherwise            = (manPacDir state)
+      | (up `S.member` keys)   && invalidDir state (manPacPos state) (0, -manPacSpeed) = turnPac state (0, -manPacSpeed)
+      | (down `S.member` keys) && invalidDir state (manPacPos state) (0, manPacSpeed)  = turnPac state (0, manPacSpeed)
+      | (left `S.member` keys) && invalidDir state (manPacPos state) (-manPacSpeed, 0) = turnPac state (-manPacSpeed, 0)
+      | (right `S.member`keys) && invalidDir state (manPacPos state) (manPacSpeed, 0)  = turnPac state (manPacSpeed, 0)
+      | otherwise            = state
 
+turnPac :: GameState -> Point -> GameState
+turnPac state (dirX,dirY) | dirX == 0 && dirY > 0 = state {activeA = (animations state) !! 2, manPacDir = (dirX,dirY)}
+						  | dirX == 0 && dirY < 0 = state {activeA = (animations state) !! 1, manPacDir = (dirX,dirY)}
+						  | dirX > 0 && dirY == 0 = state {activeA = (animations state) !! 3, manPacDir = (dirX,dirY)}
+						  | otherwise = state {activeA = (animations state) !! 0, manPacDir = (dirX,dirY)}
 
 pelletCollide :: GameState -> GameState
 pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (circleToBox (manPacPos state) (manRad/2))] state
@@ -136,7 +141,7 @@ checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (o
 			| otherwise = (x,y)
 
 invalidDir :: GameState -> Point -> Vector -> Bool
-invalidDir state pos v = not $ invalidDir' (pos `move` v) state
+invalidDir state pos v =  (not (v == (manPacDir state))) && (not $ invalidDir' (pos `move` v) state)
 
 invalidDir' :: Point -> GameState -> Bool
 invalidDir' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
