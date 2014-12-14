@@ -208,11 +208,3 @@ walls = -- the outer walls
 		[Rect (manRad*12) (manRad*15) (manRad*6) (manRad*1) ] ++
 		[Rect (manRad*12) (manRad*16) (manRad*1) (manRad*4) ] ++ 
 		[Rect (manRad*17) (manRad*16) (manRad*1) (manRad*4) ]
-{-
-walls :: [Rect]
-walls = [Rect (manRad*2 + p*(manRad*15)) (manRad*2) (manRad*13) manRad | p <- [0..1] ]
-		++ [Rect (manRad*2 + p*(manRad*3)) (manRad*5) manRad (manRad*17) | p <- [0..9] ] 
-		++ [Rect (manRad*2 + p*(manRad*15)) (manRad*24) (manRad*13) manRad | p <- [0..1] ]
-		-- ++ [Rect (manRad*2 + p*(manRad*3)) (manRad*27) manRad (manRad*17) | p <- [0..25] ] 
-		-- ++ [Rect (manRad*2 + p*(manRad*15)) (manRad*46) (manRad*13) manRad | p <- [0..4] ]
--}
