@@ -126,13 +126,13 @@ pelletCollide' (x:xs) state = pelletCollide' xs state { pellets = delete x (pell
 									  score = (score state) + 1 }  
 
 checkBounding :: GameState -> GameState
-checkBounding state = state { manPacPos = (manPacPos (oOB (manPacPos state) state)) }
+checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (oOB (ghostPos state))}
 	where 
-		oOB :: Point -> GameState -> GameState
-		oOB (x,y) state
-			| x > width = state { manPacPos = (0,y) }
-			| x < 0	    = state { manPacPos = (width, y) } 
-			| otherwise = state
+		oOB :: Point -> Point
+		oOB (x,y)
+			| x > width = (0,y)
+			| x < 0	    = (width,y)
+			| otherwise = (x,y)
 
 invalidDir :: GameState -> Point -> Vector -> Bool
 invalidDir state pos v = not $ invalidDir' (pos `move` v) state
