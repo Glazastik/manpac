@@ -14,23 +14,20 @@ data GameState = GameState {
     score :: Int,
     tilemap :: Tilemap,
     animations :: [Animation],
-    activeA :: Animation,
-    dir :: Direction
+    activeA :: Animation
   }
 
 data Tilemap = Tilemap {
     bitmap    :: Bitmap,
     mapH :: Double,
     mapW :: Double
-  }
+}
 
 data Animation = Animation {
 	tiles    :: [Rect],
 	timing   :: [Integer],
 	counter :: Integer
 }
-
-data Direction = UP | DOWN | LEFT | RIGHT
 
 -- Width and height of the playing field.
 width, height :: Double
@@ -103,6 +100,11 @@ stepVector vec | vec == (0, -manPacSpeed) = (-manPacSpeed, 0)
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
 
+incAnim :: GameState -> GameState
+incAnim state | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
+			  | otherwise                          = state {activeA = (activeA state) {counter = c'}}
+			 where c' = (counter (activeA state)) + 1
+
 -- | Updates pacman direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
 changeManPacDir keys state = state { manPacDir = (pacDir 'W' 'S' 'A' 'D') }
@@ -153,7 +155,6 @@ initialState tile anims = GameState {
     score = 0,
     tilemap = tile,
     animations = anims,
-    dir = LEFT,
     activeA = head anims
 }
 

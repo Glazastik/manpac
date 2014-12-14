@@ -5,45 +5,6 @@ import Data.IORef
 import Data.Char
 import Logic
 
--- | Render the game's state to a canvas.
-renderState :: Canvas -> GameState -> IO ()
-renderState can state = render can $ do
-	--manPac (manPacPos state)
-	ghostPic (ghostPos state)
-	mapM_ wallPic $ (wallBlocks state) 
-	mapM_ pellet $ (pellets state)
-	--drawTile (tilemap state) (1,0) (manPacPos state)
-	animatePac (tilemap state) (manPacPos state) (activeA state)
-	
-
-animate :: Tilemap -> Point -> Animation -> Picture ()
-animate tmap pos anim = drawTileRect tmap (getCurrentFrame anim) pos
-
-animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
- scale (manRad / mW *2, manRad / mH *2) $ animate tmap (0,0) anim
-	where 
-  	mH = (mapH tmap)
-	mW = (mapW tmap)
-
-
-getCurrentFrame :: Animation -> Rect
-getCurrentFrame anim = head [t | (t,x) <- zip (tiles anim) (timing anim), (counter anim) < x]
- 
-drawTileRect :: Tilemap -> Rect -> Point -> Picture ()
-drawTileRect tmap rect pos = drawClipped (bitmap tmap) pos rect
-
-drawTile :: Tilemap -> Point -> Point -> Picture ()
-drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manRad / mW *2, manRad / mH *2) $ 
-	drawClipped (bitmap tmap) (0,0) (Rect (idX * mW) (idY * mH) mW mH)
-  where 
-  	mH = (mapH tmap)
-	mW = (mapW tmap)
-
-incAnim :: GameState -> GameState
-incAnim state | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
-			  | otherwise                          = state {activeA = (activeA state) {counter = c'}}
-			 where c' = (counter (activeA state)) + 1
-
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
 newCanvas w h = do
@@ -126,6 +87,41 @@ drawImg img c pt = do
   render c $ scale (1,1) $ do
   	draw img pt
 
+-- | Render the game's state to a canvas.
+renderState :: Canvas -> GameState -> IO ()
+renderState can state = render can $ do
+	--manPac (manPacPos state)
+	ghostPic (ghostPos state)
+	mapM_ wallPic $ (wallBlocks state) 
+	mapM_ pellet $ (pellets state)
+	--drawTile (tilemap state) (1,0) (manPacPos state)
+	animatePac (tilemap state) (manPacPos state) (activeA state)
+	
+
+animate :: Tilemap -> Point -> Animation -> Picture ()
+animate tmap pos anim = drawTileRect tmap (getCurrentFrame anim) pos
+
+animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
+ scale (manRad / mW *2, manRad / mH *2) $ animate tmap (0,0) anim
+	where 
+  	mH = (mapH tmap)
+	mW = (mapW tmap)
+
+
+getCurrentFrame :: Animation -> Rect
+getCurrentFrame anim = head [t | (t,x) <- zip (tiles anim) (timing anim), (counter anim) < x]
+ 
+drawTileRect :: Tilemap -> Rect -> Point -> Picture ()
+drawTileRect tmap rect pos = drawClipped (bitmap tmap) pos rect
+
+drawTile :: Tilemap -> Point -> Point -> Picture ()
+drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manRad / mW *2, manRad / mH *2) $ 
+	drawClipped (bitmap tmap) (0,0) (Rect (idX * mW) (idY * mH) mW mH)
+  where 
+  	mH = (mapH tmap)
+	mW = (mapW tmap)
+
+
 -- Update the scoreboard.
 setScore :: Int -> IO ()
 setScore score = withElem ("Score") $ \e -> do
@@ -146,3 +142,4 @@ wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
 pellet :: Point -> Picture ()
 pellet pt = color (RGB 255 255 255) $ do
 	fill $ circle pt pelletRad
+
