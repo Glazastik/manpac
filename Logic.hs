@@ -92,9 +92,9 @@ moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks 
   	newPos = ((ghostPos state) `move` newDir dir)
 
 stepVector :: Vector -> Vector
-stepVector vec | vec == (0, -manPacSpeed) = (-manPacSpeed, 0)
-			   | vec == (-manPacSpeed, 0) = (0, manPacSpeed)
-			   | vec == (0, manPacSpeed) = (manPacSpeed, 0)
+stepVector vec | vec == (0, -manPacSpeed) = (0, manPacSpeed)
+			   | vec == (0, manPacSpeed) = (-manPacSpeed, 0)
+			   | vec == (-manPacSpeed, 0) = (manPacSpeed, 0)
 			   | vec == (manPacSpeed, 0) = (0, -manPacSpeed)
 
 circleToBox :: Point -> Double -> Rect

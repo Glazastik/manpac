@@ -91,9 +91,9 @@ drawImg img c pt = do
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	--manPac (manPacPos state)
-	ghostPic (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
+	ghostPic (ghostPos state)
 	--drawTile (tilemap state) (1,0) (manPacPos state)
 	animatePac (tilemap state) (manPacPos state) (activeA state)
 	
