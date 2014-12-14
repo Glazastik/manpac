@@ -5,6 +5,14 @@ import Data.IORef
 import Data.Char
 import Logic
 
+data Animation = Animation {
+	pics :: [Bitmap],
+	timing :: [Integer],
+	pos :: Point,
+	loaded :: Bool
+}
+
+
 -- | Render the game's state to a canvas.
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
@@ -49,22 +57,33 @@ newScoreboard = do
   setChildren scoreboard [score]
   return scoreboard
 
+main :: IO ()
 main = do
   canvasElem <- newCanvas width height
   Just canvas <- getCanvas canvasElem
   scoreboard <- newScoreboard
   setChildren documentBody [canvasElem, scoreboard]
-  render canvas $ do manPac (height/2,width/2)
+  setScore 0
+  --render canvas $ do manPac (height/2,width/2)
+
+
+
+  --pacImgR <- newIORef $ manPacImg
 
   keysPressed <- newIORef S.empty
   documentBody `onEvent` OnKeyDown $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.insert (chr k) keys, ())
   documentBody `onEvent` OnKeyUp $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
-
-  setScore 0
+  --bitmapElem manPacImg `onEvent` OnLoad $ do
+    --drawImg manPacImg canvas (150,150)
 
   tick canvas keysPressed initialState
+
+drawImg :: Bitmap -> Canvas -> Point -> IO ()
+drawImg img c pt = do
+  render c $ scale (1,1) $ do
+  	draw img pt
 
 -- Update the scoreboard.
 setScore :: Int -> IO ()
