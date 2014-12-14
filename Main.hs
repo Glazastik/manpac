@@ -42,7 +42,7 @@ tick can keysRef state = do
     renderState can state'
     setTimeout 30 $ tick can keysRef state'
   where
-    update keys = checkBounding . pelletCollide . moveManPac . changeManPacDir keys
+    update keys = moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 
 -- | Create a new scoreboard.
 newScoreboard :: IO Elem

@@ -8,6 +8,7 @@ data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
     ghostPos :: Point,
+    ghostDir :: Vector,
     wallBlocks :: [Rect],
     pellets :: [Point],
     score :: Int,
@@ -66,7 +67,7 @@ overlaps (Rect r1x1 r1y1 r1w r1l) (Rect r2x1 r2y1 r2w r2l) =
 		(r1y1 < (r2y1+r2l)) &&
 		((r1y1+r1l) > r2y1))
 
--- | Update the ball's position with its velocity.
+-- | Updates pacmans position with his velocity.
 moveManPac :: GameState -> GameState
 moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
 						True  -> state {manPacDir = (0,0)}
@@ -75,16 +76,17 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
     p = ((manPacPos state) `move` (manPacDir state))
 
 moveGhost :: GameState -> GameState
-moveGhost state = state { ghostPos = newPos }
-  where 
-    keys = S.insert 'D' keys -- (S.insert 'W' keys)
-    newPos = ((ghostPos state) `move` moveDir (ghostPos state) 'W' 'S' 'A' 'D')
-    moveDir pos up down left right
-      | (up `S.member` keys)   && invalidDir state pos (0, -manPacSpeed) = (0, -manPacSpeed) 
-      | (down `S.member` keys) && invalidDir state pos (0, manPacSpeed)  = (0, manPacSpeed)  
-      | (left `S.member` keys) && invalidDir state pos (-manPacSpeed, 0) = (-manPacSpeed, 0) 
-      | (right `S.member`keys) && invalidDir state pos (manPacSpeed, 0)  = (manPacSpeed, 0)  
-      | otherwise            = (0,0)
+moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
+					   True  -> state { ghostPos = newPos, ghostDir = newDir }
+					   False -> state { ghostPos = p }
+  where
+  	p 	   = ((ghostPos state) `move` (ghostDir state))
+  	currDir = ghostDir state
+  	newDir | (currDir == (0, -manPacSpeed)) = (-manPacSpeed, 0)
+  		   | (currDir == (-manPacSpeed, 0)) = (0, manPacSpeed)
+  		   | (currDir == (0, manPacSpeed))  = (manPacSpeed, 0)
+  		   | (currDir == (manPacSpeed, 0))  = (0, -manPacSpeed)
+  	newPos = ((ghostPos state) `move` newDir)
 
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
@@ -133,6 +135,7 @@ initialState tile = GameState {
 	manPacPos = (width/2, manRad*6),
     manPacDir = (0,0),
     ghostPos = (width/2, manRad*18),
+    ghostDir = (0, -manPacSpeed),
     wallBlocks = walls,
     pellets = pelletsInit,
     score = 0,
