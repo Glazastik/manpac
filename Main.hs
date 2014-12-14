@@ -12,11 +12,11 @@ renderState can state = render can $ do
 	ghostPic (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
-	drawTile (tilemap state) (0,0) (manPacPos state)
+	drawTile (tilemap state) (1,0) (manPacPos state)
 
 drawTile :: Tilemap -> Point -> Point -> Picture ()
-drawTile tmap (idX,idY) pt = scale (manRad / mW * 2, manRad / mH * 2) 
-	$ drawClipped (bitmap tmap) pt (Rect (idX * mW) (idY * mH) mW mH)
+drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manRad / mW *2, manRad / mH *2) $ 
+	drawClipped (bitmap tmap) (0,0) (Rect (idX * mW) (idY * mH) mW mH)
   where 
   	mH = (mapH tmap)
 	mW = (mapW tmap)
