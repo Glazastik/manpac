@@ -5,21 +5,21 @@ import Data.IORef
 import Data.Char
 import Logic
 
-data Animation = Animation {
-	pics :: [Bitmap],
-	timing :: [Integer],
-	pos :: Point,
-	loaded :: Bool
-}
-
-
 -- | Render the game's state to a canvas.
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
-	manPac (manPacPos state)
+	--manPac (manPacPos state)
 	ghostPic (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
+	drawTile (tilemap state) (0,0) (manPacPos state)
+
+drawTile :: Tilemap -> Point -> Point -> Picture ()
+drawTile tmap (idX,idY) pt = scale (manRad / mW * 2, manRad / mH * 2) 
+	$ drawClipped (bitmap tmap) pt (Rect (idX * mW) (idY * mH) mW mH)
+  where 
+  	mH = (mapH tmap)
+	mW = (mapW tmap)
 
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
@@ -62,23 +62,26 @@ main = do
   canvasElem <- newCanvas width height
   Just canvas <- getCanvas canvasElem
   scoreboard <- newScoreboard
+  
   setChildren documentBody [canvasElem, scoreboard]
-  setScore 0
-  --render canvas $ do manPac (height/2,width/2)
-
-
-
-  --pacImgR <- newIORef $ manPacImg
+  render canvas $ text (110, 120) "Loading, please wait..."
+  tileset <- loadBitmap "res/tileset.png" 
 
   keysPressed <- newIORef S.empty
   documentBody `onEvent` OnKeyDown $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.insert (chr k) keys, ())
   documentBody `onEvent` OnKeyUp $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
-  --bitmapElem manPacImg `onEvent` OnLoad $ do
-    --drawImg manPacImg canvas (150,150)
-
-  tick canvas keysPressed initialState
+  bitmapElem tileset `onEvent` OnLoad $ do
+    tick canvas keysPressed (initialState (newTilemap tileset))
+  return ()
+  
+newTilemap :: Bitmap -> Tilemap
+newTilemap map1 = Tilemap {
+	bitmap = map1,
+	mapW = 50,
+	mapH = 50
+}
 
 drawImg :: Bitmap -> Canvas -> Point -> IO ()
 drawImg img c pt = do
