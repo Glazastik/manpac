@@ -81,16 +81,24 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
 
 moveGhost :: GameState -> GameState
 moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
-					   True  -> state { ghostPos = newPos, ghostDir = newDir }
+					   True  -> state { ghostPos = newPos, ghostDir = newDir dir }
 					   False -> state { ghostPos = p }
   where
   	p 	   = ((ghostPos state) `move` (ghostDir state))
-  	currDir = ghostDir state
-  	newDir | (currDir == (0, -manPacSpeed)) = (-manPacSpeed, 0)
-  		   | (currDir == (-manPacSpeed, 0)) = (0, manPacSpeed)
-  		   | (currDir == (0, manPacSpeed))  = (manPacSpeed, 0)
-  		   | (currDir == (manPacSpeed, 0))  = (0, -manPacSpeed)
-  	newPos = ((ghostPos state) `move` newDir)
+  	dir = ghostDir state
+  	newDir currDir
+	   | (currDir == (0, -manPacSpeed)) && invalidDir state (ghostPos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
+	   | (currDir == (-manPacSpeed, 0)) && invalidDir state (ghostPos state) (0, manPacSpeed) = (0, manPacSpeed)
+	   | (currDir == (0, manPacSpeed)) && invalidDir state (ghostPos state) (manPacSpeed, 0) = (manPacSpeed, 0)
+	   | (currDir == (manPacSpeed, 0)) && invalidDir state (ghostPos state) (0, -manPacSpeed) = (0, -manPacSpeed)
+	   | otherwise = newDir (stepVector currDir)
+  	newPos = ((ghostPos state) `move` newDir dir)
+
+stepVector :: Vector -> Vector
+stepVector vec | vec == (0, -manPacSpeed) = (-manPacSpeed, 0)
+			   | vec == (-manPacSpeed, 0) = (0, manPacSpeed)
+			   | vec == (0, manPacSpeed) = (manPacSpeed, 0)
+			   | vec == (manPacSpeed, 0) = (0, -manPacSpeed)
 
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
@@ -214,6 +222,7 @@ walls = -- the outer walls
 		[Rect (manRad*20) (manRad*15) (manRad*7) (manRad*2) ] ++
 
 		-- "ghost cage"
-		[Rect (manRad*12) (manRad*15) (manRad*6) (manRad*1) ] ++
+		[Rect (manRad*12) (manRad*15) (manRad*2) (manRad*1) ] ++
+		[Rect (manRad*16) (manRad*15) (manRad*2) (manRad*1) ] ++
 		[Rect (manRad*12) (manRad*16) (manRad*1) (manRad*4) ] ++ 
 		[Rect (manRad*17) (manRad*16) (manRad*1) (manRad*4) ]
