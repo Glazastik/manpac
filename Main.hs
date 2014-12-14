@@ -32,9 +32,9 @@ tick can keysRef state = do
 -- | Render the game's state to a canvas.
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
-	ghostPic (tilemap state) (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
+	ghostPic (tilemap state) (ghostPos state)
 	--drawTile (tilemap state) (1,0) (manPacPos state)
 	animatePac (tilemap state) (manPacPos state) (activeA state)
 
