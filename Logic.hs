@@ -12,7 +12,10 @@ data GameState = GameState {
     wallBlocks :: [Rect],
     pellets :: [Point],
     score :: Int,
-    tilemap :: Tilemap
+    tilemap :: Tilemap,
+    animations :: [Animation],
+    activeA :: Animation,
+    dir :: Direction
   }
 
 data Tilemap = Tilemap {
@@ -22,11 +25,12 @@ data Tilemap = Tilemap {
   }
 
 data Animation = Animation {
-	tiles    :: [Integer],
+	tiles    :: [Rect],
 	timing   :: [Integer],
-	pos      :: Point
+	counter :: Integer
 }
 
+data Direction = UP | DOWN | LEFT | RIGHT
 
 -- Width and height of the playing field.
 width, height :: Double
@@ -130,8 +134,8 @@ outOfBounds :: Point -> Bool
 outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0 
 					|| (y+manRad) > height || (y-manRad) < 0
 
-initialState :: Tilemap -> GameState
-initialState tile = GameState {
+initialState :: Tilemap -> [Animation] -> GameState
+initialState tile anims = GameState {
 	manPacPos = (width/2, manRad*6),
     manPacDir = (0,0),
     ghostPos = (width/2, manRad*18),
@@ -139,7 +143,10 @@ initialState tile = GameState {
     wallBlocks = walls,
     pellets = pelletsInit,
     score = 0,
-    tilemap = tile
+    tilemap = tile,
+    animations = anims,
+    dir = LEFT,
+    activeA = head anims
 }
 
 pelletsInit :: [Point]

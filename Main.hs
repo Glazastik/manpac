@@ -12,7 +12,25 @@ renderState can state = render can $ do
 	ghostPic (ghostPos state)
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
-	drawTile (tilemap state) (1,0) (manPacPos state)
+	--drawTile (tilemap state) (1,0) (manPacPos state)
+	animatePac (tilemap state) (manPacPos state) (activeA state)
+	
+
+animate :: Tilemap -> Point -> Animation -> Picture ()
+animate tmap pos anim = drawTileRect tmap (getCurrentFrame anim) pos
+
+animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
+ scale (manRad / mW *2, manRad / mH *2) $ animate tmap (0,0) anim
+	where 
+  	mH = (mapH tmap)
+	mW = (mapW tmap)
+
+
+getCurrentFrame :: Animation -> Rect
+getCurrentFrame anim = head [t | (t,x) <- zip (tiles anim) (timing anim), (counter anim) < x]
+ 
+drawTileRect :: Tilemap -> Rect -> Point -> Picture ()
+drawTileRect tmap rect pos = drawClipped (bitmap tmap) pos rect
 
 drawTile :: Tilemap -> Point -> Point -> Picture ()
 drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manRad / mW *2, manRad / mH *2) $ 
@@ -20,6 +38,11 @@ drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manR
   where 
   	mH = (mapH tmap)
 	mW = (mapW tmap)
+
+incAnim :: GameState -> GameState
+incAnim state | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
+			  | otherwise                          = state {activeA = (activeA state) {counter = c'}}
+			 where c' = (counter (activeA state)) + 1
 
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
@@ -42,7 +65,8 @@ tick can keysRef state = do
     renderState can state'
     setTimeout 30 $ tick can keysRef state'
   where
-    update keys = moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
+    update keys = incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
+
 
 -- | Create a new scoreboard.
 newScoreboard :: IO Elem
@@ -73,9 +97,23 @@ main = do
   documentBody `onEvent` OnKeyUp $ \k -> do
     atomicModifyIORef keysPressed $ \keys -> (S.delete (chr k) keys, ())
   bitmapElem tileset `onEvent` OnLoad $ do
-    tick canvas keysPressed (initialState (newTilemap tileset))
+    initialize canvas keysPressed (newTilemap tileset)
   return ()
-  
+
+initialize :: Canvas -> IORef (S.Set Char) -> Tilemap -> IO ()
+initialize c k tmap = tick c k $ initialState tmap (pacAnimations tmap)
+
+pacAnimations :: Tilemap -> [Animation]
+pacAnimations tilemap = [Animation {
+	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [0,1,2,3] ],
+	timing = [10,20,30,40],
+	counter = 0
+}, Animation {
+	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [0,4,5,6] ],
+	timing = [250,500,750,1000],
+	counter = 0
+}]
+
 newTilemap :: Bitmap -> Tilemap
 newTilemap map1 = Tilemap {
 	bitmap = map1,
