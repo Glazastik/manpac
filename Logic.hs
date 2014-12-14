@@ -101,7 +101,8 @@ circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
 
 incAnim :: GameState -> GameState
-incAnim state | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
+incAnim state | (manPacDir state) == (0,0) = state {activeA = (activeA state) {counter = c' - 1}}
+			  | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
 			  | otherwise                          = state {activeA = (activeA state) {counter = c'}}
 			 where c' = (counter (activeA state)) + 1
 
