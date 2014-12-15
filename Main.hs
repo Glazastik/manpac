@@ -53,6 +53,7 @@ newScoreboard = do
   setChildren scoreboard [score]
   return scoreboard
 
+--Main loop of the program.
 main :: IO ()
 main = do
   canvasElem <- newCanvas width height
@@ -61,7 +62,7 @@ main = do
   
   setChildren documentBody [canvasElem, scoreboard]
   render canvas $ text (110, 120) "Loading, please wait..."
-  tileset <- loadBitmap "res/tileset.png" 
+  tileset <- loadBitmap "tileset.png" 
 
   keysPressed <- newIORef S.empty
   documentBody `onEvent` OnKeyDown $ \k -> do
@@ -72,9 +73,11 @@ main = do
     initialize canvas keysPressed (newTilemap tileset)
   return ()
 
+--Initialization stuff
 initialize :: Canvas -> IORef (S.Set Char) -> Tilemap -> IO ()
 initialize c k tmap = tick c k $ initialState tmap (pacAnimations tmap)
 
+-- All the animations for manPac
 pacAnimations :: Tilemap -> [Animation]
 pacAnimations tilemap = [Animation {
 	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [3,2,1,0] ],
@@ -96,36 +99,35 @@ pacAnimations tilemap = [Animation {
 	counter = 0
 }]
 
+--Generates a tileMap from a bitmap, magic values are pixel dimensions for each tile
 newTilemap :: Bitmap -> Tilemap
 newTilemap map1 = Tilemap {
 	bitmap = map1,
 	mapW = 50,
 	mapH = 50
 }
-
-drawImg :: Bitmap -> Canvas -> Point -> IO ()
-drawImg img c pt = do
-  render c $ scale (1,1) $ do
-  	draw img pt
-
 	
-
+--Draws the current frame of an animation at the given point.
 animate :: Tilemap -> Point -> Animation -> Picture ()
 animate tmap pos anim = drawTileRect tmap (getCurrentFrame anim) pos
 
+--Draws a manPac with animation.
+animatePac :: Tilemap -> Point -> Animation -> Picture ()
 animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
  scale (manRad / mW *2, manRad / mH *2) $ animate tmap (0,0) anim
 	where 
   	mH = (mapH tmap)
 	mW = (mapW tmap)
 
-
+--Gets the current frame in an animation as a rectangle.
 getCurrentFrame :: Animation -> Rect
 getCurrentFrame anim = head [t | (t,x) <- zip (tiles anim) (timing anim), (counter anim) < x]
  
+--Draw a rectangle from a tilemap at the given point.
 drawTileRect :: Tilemap -> Rect -> Point -> Picture ()
 drawTileRect tmap rect pos = drawClipped (bitmap tmap) pos rect
 
+--Draw a tile from a tilemap at the given point.
 drawTile :: Tilemap -> Point -> Point -> Picture ()
 drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manRad / mW *2, manRad / mH *2) $ 
 	drawClipped (bitmap tmap) (0,0) (Rect (idX * mW) (idY * mH) mW mH)
@@ -139,17 +141,16 @@ setScore :: Int -> IO ()
 setScore score = withElem ("Score") $ \e -> do
   setProp e "innerText" ("score: " ++ show score)
 
-manPac :: Point -> Picture () 
-manPac pt = color (RGB 255 255 0) $ do
-  fill $ circle pt manRad 
-
+--Draws a ghost from the tilemap at the given point.
 ghostPic :: Tilemap -> Point -> Picture ()
 ghostPic tmap pt = drawTile tmap (0,1) pt
 
+--Draws a wall at the given rectangle.
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
   fill $ rect (x1,y1) (x1+x2,y1+y2) 
 
+--Draws a pellet at the given point.
 pellet :: Point -> Picture ()
 pellet pt = color (RGB 255 255 255) $ do
 	fill $ circle pt pelletRad
