@@ -37,6 +37,7 @@ renderState can state = render can $ do
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
 	ghostPic (tilemap state) (ghostPos state)
+	--ghostPic (tilemap state) (ghost2Pos state)
 	--drawTile (tilemap state) (1,0) (manPacPos state)
 	animatePac (tilemap state) (manPacPos state) (activeA state)
 
