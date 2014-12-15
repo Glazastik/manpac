@@ -88,11 +88,11 @@ moveHomingGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallB
   	p = (ghost2Pos state) `move` dir
   	dir = newDir
   	newDir 
-  	  | xDiff < 0 && invalidDir state (ghost2Pos state) (-manPacSpeed, 0) = (-manPacSpeed, 0) 
-	  | xDiff > 0 && invalidDir state (ghost2Pos state) (manPacSpeed, 0) = (manPacSpeed, 0)
+  	  | xDiff < 0 && invalidDir state (ghost2Pos state) (manPacSpeed, 0) = (manPacSpeed, 0) 
+	  | xDiff > 0 && invalidDir state (ghost2Pos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
 	  | yDiff < 0 && invalidDir state (ghost2Pos state) (0, manPacSpeed) = (0, manPacSpeed)
 	  | yDiff > 0 && invalidDir state (ghost2Pos state) (0, -manPacSpeed) = (0, -manPacSpeed) 
-	  | otherwise = (ghost2Pos state)
+	  | otherwise = (ghost2Dir state)
 
 
 pointXDiff :: Point -> Point -> Double
@@ -106,7 +106,7 @@ moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks 
 					   True  -> state { ghostPos = newPos, ghostDir = newDir dir }
 					   False -> state { ghostPos = p }
   where
-  	p 	   = ((ghostPos state) `move` (ghostDir state))
+  	p = ((ghostPos state) `move` (ghostDir state))
   	dir = ghostDir state
   	newDir currDir
 	   | (currDir == (0, -manPacSpeed)) && invalidDir state (ghostPos state) (-manPacSpeed, 0) = (-manPacSpeed, 0)
