@@ -9,6 +9,8 @@ data GameState = GameState {
     manPacDir :: Vector,
     ghostPos :: Point,
     ghostDir :: Vector,
+    ghost2Pos :: Point,
+    ghost2Dir :: Vector,
     wallBlocks :: [Rect],
     pellets :: [Point],
     score :: Int,
@@ -75,6 +77,26 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
 						False -> state {manPacPos = p}
  where
     p = ((manPacPos state) `move` (manPacDir state))
+
+moveHomingGhost :: GameState -> GameState
+moveHomingGhost state = state { ghost2Pos = newPos }
+  where
+  	xDiff = pointXDiff (ghost2Pos state) (manPacPos state)
+  	yDiff = pointYDiff (ghost2Pos state) (manPacPos state)
+  	newPos = (ghost2Pos state) `move` newDir
+  	newDir 
+  	  | xDiff < 0 && invalidDir state (ghost2Pos state) (-manPacSpeed, 0) = (-manPacSpeed, 0) 
+	  | xDiff > 0 && invalidDir state (ghost2Pos state) (manPacSpeed, 0) = (manPacSpeed, 0)
+	  | yDiff < 0 && invalidDir state (ghost2Pos state) (0, manPacSpeed) = (0, manPacSpeed)
+	  | yDiff > 0 && invalidDir state (ghost2Pos state) (0, -manPacSpeed) = (0, -manPacSpeed) 
+	  | otherwise = (ghost2Pos state)
+
+
+pointXDiff :: Point -> Point -> Double
+pointXDiff (x1,y1) (x2,y2) = (x1-x2) 
+
+pointYDiff :: Point -> Point -> Double
+pointYDiff (x1,y1) (x2,y2) = (y1-y2) 
 
 moveGhost :: GameState -> GameState
 moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
@@ -160,6 +182,8 @@ initialState tile anims = GameState {
     manPacDir = (0,0),
     ghostPos = (width/2, manRad*18),
     ghostDir = (0, -manPacSpeed),
+    ghost2Pos = (width/2, manRad*18),
+    ghost2Dir = (0, -manPacSpeed),
     wallBlocks = walls,
     pellets = pelletsInit,
     score = 0,

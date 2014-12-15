@@ -28,7 +28,7 @@ tick can keysRef state = do
       True -> main
       False -> setTimeout 30 $ tick can keysRef state'
   where
-    update keys = incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
+    update keys = moveHomingGhost . incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 
 
 -- | Render the game's state to a canvas.
