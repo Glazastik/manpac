@@ -79,11 +79,14 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
     p = ((manPacPos state) `move` (manPacDir state))
 
 moveHomingGhost :: GameState -> GameState
-moveHomingGhost state = state { ghost2Pos = newPos }
+moveHomingGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
+					   		True  -> state 
+					   		False -> state { ghost2Pos = p, ghost2Dir = dir }
   where
   	xDiff = pointXDiff (ghost2Pos state) (manPacPos state)
-  	yDiff = pointYDiff (ghost2Pos state) (manPacPos state)
-  	newPos = (ghost2Pos state) `move` newDir
+  	yDiff = pointYDiff (ghost2Pos state) (manPacPos state) 
+  	p = (ghost2Pos state) `move` dir
+  	dir = newDir
   	newDir 
   	  | xDiff < 0 && invalidDir state (ghost2Pos state) (-manPacSpeed, 0) = (-manPacSpeed, 0) 
 	  | xDiff > 0 && invalidDir state (ghost2Pos state) (manPacSpeed, 0) = (manPacSpeed, 0)
@@ -178,7 +181,8 @@ outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0
 
 -- Checks whether the game is over or not.
 gameOver :: GameState -> Bool
-gameOver state = ((circleToBox (ghostPos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || (pellets state) == []
+gameOver state = ((circleToBox (ghostPos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || 
+				 ((circleToBox (ghost2Pos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || (pellets state) == []
 
 --The initial state for the game, needs resources to create.
 initialState :: Tilemap -> [Animation] -> GameState
