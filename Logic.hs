@@ -153,6 +153,7 @@ pelletCollide' [] state = state
 pelletCollide' (x:xs) state = pelletCollide' xs state { pellets = delete x (pellets state), 
 									  score = (score state) + 1 }  
 
+--If manPac is outside, he is teleported to the other side.
 checkBounding :: GameState -> GameState
 checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (oOB (ghostPos state))}
 	where 
@@ -162,20 +163,24 @@ checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (o
 			| x < 0	    = (width,y)
 			| otherwise = (x,y)
 
+--Checks if a point can move with a vector.
 invalidDir :: GameState -> Point -> Vector -> Bool
 invalidDir state pos v =  (not (v == (manPacDir state))) && (not $ invalidDir' (pos `move` v) state)
 
+--Checks if a point is inside one of the walls.
 invalidDir' :: Point -> GameState -> Bool
 invalidDir' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
 
+--Checks if a point is outside of the field.
 outOfBounds :: Point -> Bool
 outOfBounds (x,y) = (x+manRad) > width || (x-manRad) < 0 
 					|| (y+manRad) > height || (y-manRad) < 0
 
+-- Checks whether the game is over or not.
 gameOver :: GameState -> Bool
 gameOver state = ((circleToBox (ghostPos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || (pellets state) == []
 
-
+--The initial state for the game, needs resources to create.
 initialState :: Tilemap -> [Animation] -> GameState
 initialState tile anims = GameState {
 	manPacPos = (width/2, manRad*6),
@@ -192,6 +197,7 @@ initialState tile anims = GameState {
     activeA = head anims
 }
 
+--The list of all pellet points.
 pelletsInit :: [Point]
 pelletsInit = --Top row
 			  [(manRad*(p+2),manRad*2) | p <- [1..10]] ++ [(manRad*(p+17),manRad*2) | p <- [1..10]] ++
@@ -220,6 +226,7 @@ pelletsInit = --Top row
 			  --Long bottom row
 			  [(manRad*(p+2),manRad*18) | p <- [1..8]] ++ [(manRad*(p+19),manRad*18) | p <- [1..8]]
 
+-- The rectangles for the walls.
 walls :: [Rect]
 walls = -- the outer walls
 		[Rect 0 0 (manRad*30) manRad]  ++ 
