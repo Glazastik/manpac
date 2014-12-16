@@ -132,9 +132,10 @@ moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks 
 --Up = down, down = left, left = right, right = up
 stepVector :: Vector -> Vector
 stepVector vec | vec == (0, -manPacSpeed) = (0, manPacSpeed)
-			   | vec == (0, manPacSpeed) = (-manPacSpeed, 0)
+			   | vec == (0, manPacSpeed) = (0, -manPacSpeed)
 			   | vec == (-manPacSpeed, 0) = (manPacSpeed, 0)
-			   | vec == (manPacSpeed, 0) = (0, -manPacSpeed)
+			   | vec == (manPacSpeed, 0) = (-manPacSpeed, 0)
+			   | otherwise = (0,0)
 
 --Calculates the square of a position based on its radius.
 circleToBox :: Point -> Double -> Rect
