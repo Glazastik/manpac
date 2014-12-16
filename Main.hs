@@ -22,7 +22,7 @@ tick :: Canvas -> IORef (S.Set Char) -> GameState -> IO ()
 tick can keysRef state = do
     keys <- readIORef keysRef
     let state' = update keys state
-    setScore (score state)
+    
     renderState can state'
     case gameOver state of
       True -> main
@@ -40,28 +40,15 @@ renderState can state = render can $ do
 	mapPic (tilemap state) (0,2) (ghost2Pos state)
 	--drawTile (tilemap state) (1,0) (manPacPos state)
 	animatePac (tilemap state) (manPacPos state) (activeA state)
-
--- | Create a new scoreboard.
-newScoreboard :: IO Elem
-newScoreboard = do
-  scoreboard <- newElem "div"
-  setStyle scoreboard "margin" "auto"
-  setStyle scoreboard "width" "150px"
-
-  score <- newElem "div"
-  setProp score "id" ("Score")
-
-  setChildren scoreboard [score]
-  return scoreboard
+	setScore (score state)
 
 --Main loop of the program.
 main :: IO ()
 main = do
   canvasElem <- newCanvas width height
   Just canvas <- getCanvas canvasElem
-  scoreboard <- newScoreboard
   
-  setChildren documentBody [canvasElem, scoreboard]
+  setChildren documentBody [canvasElem]
   render canvas $ text (110, 120) "Loading, please wait..."
   tileset <- loadBitmap "tileset.png" 
 
@@ -138,9 +125,12 @@ drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manR
 
 
 -- Update the scoreboard.
-setScore :: Int -> IO ()
-setScore score = withElem ("Score") $ \e -> do
-  setProp e "innerText" ("score: " ++ show score)
+--setScore :: Int -> IO ()
+--setScore score = withElem ("Score") $ \e -> do
+--  setProp e "innerText" ("score: " ++ show score)
+setScore :: Int -> Picture ()
+setScore score = translate (2*manRad, 21.3*manRad) $ scale (2,2) 
+	$ color (RGB 255 255 255) $ text (0,0) ("Pellets eaten - " ++ (show score))
 
 --Draws a static picture from the tilemap at the given point.
 mapPic :: Tilemap -> Point -> Point -> Picture ()
