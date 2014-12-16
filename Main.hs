@@ -48,7 +48,7 @@ gameOverText :: Canvas -> Int -> IO ()
 gameOverText can score = 
 	renderOnTop can $ do 
 		color (RGBA 0 0 0 0.8) $ do fill $ rect (2*manRad, 7*manRad) (width - (2*manRad), 15*manRad)
-		translate (5.5*manRad, 10*manRad) $ scale (8,5) $ color (RGBA 255 0 50 0.9) $ text (0,0) "YOU DIED"
+		translate (5*manRad, 10*manRad) $ scale (6.5,5) $ color (RGBA 255 0 50 0.9) $ text (0,0) "GAME OVER"
 		translate (11*manRad, 11.5*manRad) $ scale (4,2.5) $ color (RGBA 255 255 255 0.9) $ text (0,0) ((show score) ++ " points")
 		translate (8*manRad, 13*manRad) $ scale (3,2) $ color (RGBA 255 255 255 0.9) $ text (0,0) ("Press START to play.")
 
