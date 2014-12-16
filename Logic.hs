@@ -36,7 +36,7 @@ width, height :: Double
 width  = 30 * manRad
 height = 22 * manRad
 
--- How big manPac is
+-- How big manPac is, affects everything in the game.
 manRad :: Double
 manRad = 20
 
