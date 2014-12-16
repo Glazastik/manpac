@@ -25,11 +25,32 @@ tick can keysRef state = do
     
     renderState can state'
     case gameOver state of
-      True -> main
+      True -> deathScene can keysRef state'
       False -> setTimeout 30 $ tick can keysRef state'
   where
     update keys = moveHomingGhost . incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 
+deathScene :: Canvas -> IORef (S.Set Char) -> GameState -> IO () 
+deathScene can keysRef state = do
+	keys <- readIORef keysRef
+	let state' = update state
+	renderState can state'
+	gameOverText can (score state)
+	case (spaceKey `S.member` keys || enterKey `S.member` keys) of
+		True -> main
+		False -> setTimeout 30 $ deathScene can keysRef state'
+
+  where update = moveHomingGhost . moveGhost 
+  	spaceKey = chr 32
+  	enterKey = chr 13
+
+gameOverText :: Canvas -> Int -> IO ()
+gameOverText can score = 
+	renderOnTop can $ do 
+		color (RGBA 0 0 0 0.8) $ do fill $ rect (2*manRad, 7*manRad) (width - (2*manRad), 15*manRad)
+		translate (6*manRad, 10*manRad) $ scale (8,5) $ color (RGBA 255 0 50 0.9) $ text (0,0) "YOU DIED"
+		translate (11*manRad, 11.5*manRad) $ scale (4,2.5) $ color (RGBA 255 255 255 0.9) $ text (0,0) ((show score) ++ " points")
+		translate (8*manRad, 13*manRad) $ scale (3,2) $ color (RGBA 255 255 255 0.9) $ text (0,0) ("Press START to play.")
 
 -- | Render the game's state to a canvas.
 renderState :: Canvas -> GameState -> IO ()
