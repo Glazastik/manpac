@@ -3,6 +3,15 @@ import qualified Data.Set as S
 import Data.List
 import Haste.Graphics.Canvas
 
+{-
+	Anton Myrholm	19930924-7071
+	Viktor Karlsson	19930816-7213
+	Group 4
+
+	Functional Programming 2014
+	Chalmers
+-}
+
 -- The state of our game.
 data GameState = GameState {
     manPacPos :: Point,

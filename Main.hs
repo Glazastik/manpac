@@ -5,6 +5,16 @@ import Data.IORef
 import Data.Char
 import Logic
 
+{-
+	Anton Myrholm	19930924-7071
+	Viktor Karlsson	19930816-7213
+	Group 4
+
+	Functional Programming 2014
+	Chalmers
+-}
+
+
 -- Create a new canvas to draw on.
 newCanvas :: Double -> Double -> IO Elem
 newCanvas w h = do
