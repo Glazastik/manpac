@@ -59,11 +59,12 @@ renderState can state = render can $ do
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
 
-	mapPic (tilemap state) (0,1) (ghostPos state)
-	mapPic (tilemap state) (0,2) (ghost2Pos state)
+	mapPic tiles (0,1) (ghostPos state)
+	mapPic tiles (0,2) (ghost2Pos state)
 
-	animatePac (tilemap state) (manPacPos state) (activeA state)
+	animatePac tiles (manPacPos state) (activeA state)
 	setScore (score state)
+  where tiles = (tilemap state)
 
 -- Main loop of the program.
 main :: IO ()
@@ -89,6 +90,7 @@ initialize :: Canvas -> IORef (S.Set Char) -> Tilemap -> IO ()
 initialize c k tmap = tick c k $ initialState tmap (pacAnimations tmap)
 
 -- All the animations for manPac
+-- Could be made way prettier, but works with only these few animations.
 pacAnimations :: Tilemap -> [Animation]
 pacAnimations tilemap = [Animation {
 	tiles = [(Rect (x * (mapW tilemap)) 0 (mapW tilemap) (mapH tilemap)) | x <- [3,2,1,0] ],
