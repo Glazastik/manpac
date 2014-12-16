@@ -17,7 +17,7 @@ newCanvas w h = do
 	setProp canvas "height" (show h)
 	return canvas
 
--- | A unit of time, updates the game state accordingly.
+-- A unit of time, updates the game state accordingly.
 tick :: Canvas -> IORef (S.Set Char) -> GameState -> IO ()
 tick can keysRef state = do
     keys <- readIORef keysRef
@@ -40,6 +40,7 @@ deathScene can keysRef state = do
 		True -> main
 		False -> setTimeout 30 $ deathScene can keysRef state'
 
+  -- The ghosts moving while the game is over is to add effect, it is intentional.
   where update = moveHomingGhost . moveGhost 
   	spaceKey = chr 32
   	enterKey = chr 13
@@ -52,18 +53,19 @@ gameOverText can score =
 		translate (11*manRad, 11.5*manRad) $ scale (4,2.5) $ color (RGBA 255 255 255 0.9) $ text (0,0) ((show score) ++ " points")
 		translate (8*manRad, 13*manRad) $ scale (3,2) $ color (RGBA 255 255 255 0.9) $ text (0,0) ("Press START to play.")
 
--- | Render the game's state to a canvas.
+-- Render the game's state to a canvas.
 renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
+
 	mapPic (tilemap state) (0,1) (ghostPos state)
 	mapPic (tilemap state) (0,2) (ghost2Pos state)
-	--drawTile (tilemap state) (1,0) (manPacPos state)
+
 	animatePac (tilemap state) (manPacPos state) (activeA state)
 	setScore (score state)
 
---Main loop of the program.
+-- Main loop of the program.
 main :: IO ()
 main = do
   canvasElem <- newCanvas width height
@@ -82,7 +84,7 @@ main = do
     initialize canvas keysPressed (newTilemap tileset)
   return ()
 
---Initialization stuff
+-- Initialization stuff
 initialize :: Canvas -> IORef (S.Set Char) -> Tilemap -> IO ()
 initialize c k tmap = tick c k $ initialState tmap (pacAnimations tmap)
 
@@ -108,7 +110,7 @@ pacAnimations tilemap = [Animation {
 	counter = 0
 }]
 
---Generates a tileMap from a bitmap, magic values are pixel dimensions for each tile
+-- Generates a tileMap from a bitmap, magic values are pixel dimensions for each tile
 newTilemap :: Bitmap -> Tilemap
 newTilemap map1 = Tilemap {
 	bitmap = map1,
@@ -116,11 +118,11 @@ newTilemap map1 = Tilemap {
 	mapH = 50
 }
 	
---Draws the current frame of an animation at the given point.
+-- Draws the current frame of an animation at the given point.
 animate :: Tilemap -> Point -> Animation -> Picture ()
 animate tmap pos anim = drawTileRect tmap (getCurrentFrame anim) pos
 
---Draws a manPac with animation.
+-- Draws a manPac with animation.
 animatePac :: Tilemap -> Point -> Animation -> Picture ()
 animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
  scale (manRad / mW *2, manRad / mH *2) $ animate tmap (0,0) anim
@@ -128,11 +130,11 @@ animatePac tmap (x,y) anim = translate (x - manRad ,y - manRad) $
   	mH = (mapH tmap)
 	mW = (mapW tmap)
 
---Gets the current frame in an animation as a rectangle.
+-- Gets the current frame in an animation as a rectangle.
 getCurrentFrame :: Animation -> Rect
 getCurrentFrame anim = head [t | (t,x) <- zip (tiles anim) (timing anim), (counter anim) < x]
  
---Draw a rectangle from a tilemap at the given point.
+-- Draw a rectangle from a tilemap at the given point.
 drawTileRect :: Tilemap -> Rect -> Point -> Picture ()
 drawTileRect tmap rect pos = drawClipped (bitmap tmap) pos rect
 
@@ -144,25 +146,21 @@ drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manR
   	mH = (mapH tmap)
 	mW = (mapW tmap)
 
-
--- Update the scoreboard.
---setScore :: Int -> IO ()
---setScore score = withElem ("Score") $ \e -> do
---  setProp e "innerText" ("score: " ++ show score)
+-- Generates a picture with the current score on it.
 setScore :: Int -> Picture ()
 setScore score = translate (2*manRad, 21.8*manRad) $ scale (5,4) 
 	$ color (RGB 255 255 255) $ text (0,0) ((show score))
 
---Draws a static picture from the tilemap at the given point.
+-- Draws a static picture from the tilemap at the given point.
 mapPic :: Tilemap -> Point -> Point -> Picture ()
 mapPic tmap tile pos = drawTile tmap tile pos
 
---Draws a wall at the given rectangle.
+-- Draws a wall at the given rectangle.
 wallPic :: Rect -> Picture ()
 wallPic (Rect x1 y1 x2 y2) = color (RGB 80 80 255) $ do
   fill $ rect (x1,y1) (x1+x2,y1+y2) 
 
---Draws a pellet at the given point.
+-- Draws a pellet at the given point.
 pellet :: Point -> Picture ()
 pellet pt = color (RGB 255 255 255) $ do
 	fill $ circle pt pelletRad

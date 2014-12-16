@@ -3,7 +3,7 @@ import qualified Data.Set as S
 import Data.List
 import Haste.Graphics.Canvas
 
---The state of our game.
+-- The state of our game.
 data GameState = GameState {
     manPacPos :: Point,
     manPacDir :: Vector,
@@ -36,35 +36,35 @@ width, height :: Double
 width  = 30 * manRad
 height = 22 * manRad
 
---How big manPac is.
---All measures in the whole game are based on manPacs size.
---This is because is makes it easier to place everything in the map.
+-- How big manPac is.
+-- All measures in the whole game are based on manPacs size.
+-- This is because is makes it easier to place everything in the map.
 manRad :: Double
 manRad = 20
 
---How big pellets are
+-- How big pellets are
 pelletRad :: Double
 pelletRad = manRad/5
 
---How fast is manPac
+-- How fast is manPac
 manPacSpeed :: Double
 manPacSpeed = manRad / 4
 
---Move a point by a certain velocity vector.
+-- Move a point by a certain velocity vector.
 move :: Point -> Vector -> Point
 move (x, y) (xv, yv) = (x + xv, y + yv)
 
---Check that a point is inside a rectangle.
+-- Check that a point is inside a rectangle.
 clamp :: Point -> Rect -> Point
 clamp (x, y) (Rect xMin yMin xMax yMax) =
   (min (max x xMin) xMax, min (max y yMin) yMax)
 
---Checks if a point is inside a rectangle.
+-- Checks if a point is inside a rectangle.
 inside :: Point -> Rect -> Bool
 inside (x, y) (Rect x1 y1 x2 y2) =
   x >= x1 && x <= (x1+x2) && y >= y1 && y <= (y1+y2)
 
---Checks if two rectangles are overlapping
+-- Checks if two rectangles are overlapping
 overlaps :: Rect -> Rect -> Bool
 overlaps (Rect r1x1 r1y1 r1w r1l) (Rect r2x1 r2y1 r2w r2l) = 
 	((r1x1 < (r2x1+r2w)) &&
@@ -72,7 +72,7 @@ overlaps (Rect r1x1 r1y1 r1w r1l) (Rect r2x1 r2y1 r2w r2l) =
 	(r1y1 < (r2y1+r2l)) &&
 	((r1y1+r1l) > r2y1))
 
---Updates pacmans position with his velocity vector.
+-- Updates pacmans position with his velocity vector.
 moveManPac :: GameState -> GameState
 moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
 						True  -> state {manPacDir = (0,0)}
@@ -80,10 +80,10 @@ moveManPac state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks
  where
     p = ((manPacPos state) `move` (manPacDir state))
 
---Moves the black ghost, it is supposed to always go towards the manPac.
---It is very basic homing and far from perfect, it chooses direction based on 
---the difference in x and y between its own and manPacs position. 
---Where it prioritizes movement in x direction.
+-- Moves the black ghost, it is supposed to always go towards the manPac.
+-- It is very basic homing and far from perfect, it chooses direction based on 
+-- the difference in x and y between its own and manPacs position. 
+-- Where it prioritizes movement in x direction.
 moveHomingGhost :: GameState -> GameState
 moveHomingGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
 					   		True  -> state 
@@ -100,19 +100,19 @@ moveHomingGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallB
 	  | yDiff > 0 && invalidDir state (ghost2Pos state) (0, -manPacSpeed) = (0, -manPacSpeed) 
 	  | otherwise = (ghost2Dir state)
 
---Calculates the difference in x between two points
+-- Calculates the difference in x between two points
 pointXDiff :: Point -> Point -> Double
 pointXDiff (x1,y1) (x2,y2) = (x1-x2) 
 
---Calculates the difference in y between two points
+-- Calculates the difference in y between two points
 pointYDiff :: Point -> Point -> Double
 pointYDiff (x1,y1) (x2,y2) = (y1-y2) 
 
---Moves the first "random" ghost (the white one), it is supposed to go until it hits a wall and then turn in another legal direction 
---based on which direction it was traveling previously acording to the pattern (up -> left -> down -> right)
---If it can't find a new direction it gets a new direction from stepVector and calculates a new direction from that.
---The different vectors are: (0, -speed) = up, (0, speed) = down, (-speed, 0) = left, (speed, 0) = right.
---The ghost tends to get stuck in loop, but sometimes if you restart or die he goes on another course for reasons unknown.
+-- Moves the first "random" ghost (the white one), it is supposed to go until it hits a wall and then turn in another legal direction 
+-- based on which direction it was traveling previously acording to the pattern (up -> left -> down -> right)
+-- If it can't find a new direction it gets a new direction from stepVector and calculates a new direction from that.
+-- The different vectors are: (0, -speed) = up, (0, speed) = down, (-speed, 0) = left, (speed, 0) = right.
+-- The ghost tends to get stuck in loop, but sometimes if you restart or die he goes on another course for reasons unknown.
 moveGhost :: GameState -> GameState
 moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)] of
 					   True  -> state { ghostPos = newPos, ghostDir = newDir dir }
@@ -128,26 +128,26 @@ moveGhost state = case or [overlaps (circleToBox p manRad) x | x <- (wallBlocks 
 	   | otherwise = newDir (stepVector currDir)
   	newPos = ((ghostPos state) `move` newDir dir)
 
---Returns a new direction vector based on the current vector 
---Up = down, down = left, left = right, right = up
+-- Returns a new direction vector based on the current vector 
+-- Up = down, down = left, left = right, right = up
 stepVector :: Vector -> Vector
 stepVector vec | vec == (0, -manPacSpeed) = (0, manPacSpeed)
 			   | vec == (0, manPacSpeed) = (-manPacSpeed, 0)
 			   | vec == (-manPacSpeed, 0) = (manPacSpeed, 0)
 			   | vec == (manPacSpeed, 0) = (0, -manPacSpeed)
 
---Calculates the square of a position based on its radius.
+-- Calculates the square of a position based on its radius.
 circleToBox :: Point -> Double -> Rect
 circleToBox (px,py) r = Rect (px - r) (py - r) (r * 2) (r * 2)
 
---Increments the animation counter, puts manPac in the next step of the animation.
+-- Increments the animation counter, puts manPac in the next step of the animation.
 incAnim :: GameState -> GameState
 incAnim state | (manPacDir state) == (0,0) = state {activeA = (activeA state) {counter = c' - 1}}
 			  | c' >= last (timing (activeA state)) = state {activeA = (activeA state) {counter = 0}}
 			  | otherwise                          = state {activeA = (activeA state) {counter = c'}}
 			 where c' = (counter (activeA state)) + 1
 
---Updates manPac direction depending on the currently pressed keys, except if there is a wall in that direction.
+-- Updates manPac direction depending on the currently pressed keys, except if there is a wall in that direction.
 changeManPacDir :: S.Set Char -> GameState -> GameState
 changeManPacDir keys state = (pacDir 'W' 'S' 'A' 'D')
   where
@@ -158,25 +158,26 @@ changeManPacDir keys state = (pacDir 'W' 'S' 'A' 'D')
       | (right `S.member`keys) && invalidDir state (manPacPos state) (manPacSpeed, 0)  = turnPac state (manPacSpeed, 0)
       | otherwise            = state
 
---Checks if you turn in a direction manPac is already moving, so it doesn't reset the animation.
+-- Checks if you turn in a direction manPac is already moving, so it doesn't reset the animation.
 turnPac :: GameState -> Point -> GameState
 turnPac state (dirX,dirY) | dirX == 0 && dirY > 0 = state {activeA = (animations state) !! 2, manPacDir = (dirX,dirY)}
 						  | dirX == 0 && dirY < 0 = state {activeA = (animations state) !! 1, manPacDir = (dirX,dirY)}
 						  | dirX > 0 && dirY == 0 = state {activeA = (animations state) !! 3, manPacDir = (dirX,dirY)}
 						  | otherwise = state {activeA = (animations state) !! 0, manPacDir = (dirX,dirY)}
 
---Checks if a pellet is within manPacs hitbox, if so it removes the pellet from the list of pellets and increments the score by one.
+-- Checks if a pellet is within manPacs hitbox,
+-- if so it removes the pellet from the list of pellets and increments the score by one.
 pelletCollide :: GameState -> GameState
 pelletCollide state = pelletCollide' [ p | p <- (pellets state),p `inside` (circleToBox (manPacPos state) (manRad/2))] state
 
---Help Method for pelletCollide, here the actual pellet is delted and the score is incremented.
---It also covers the case if there would be several pellets within manPacs radius, which can't currently happend.
+-- Help Method for pelletCollide, here the actual pellet is delted and the score is incremented.
+-- It also covers the case if there would be several pellets within manPacs radius, which can't currently happend.
 pelletCollide' :: [Point] -> GameState -> GameState
 pelletCollide' [] state = state 
 pelletCollide' (x:xs) state = pelletCollide' xs state { pellets = delete x (pellets state), 
 									  score = (score state) + 1 }  
 
---If manPac is outside, he is teleported to the other side.
+-- If manPac is outside, he is teleported to the other side.
 checkBounding :: GameState -> GameState
 checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (oOB (ghostPos state))}
 	where 
@@ -186,20 +187,21 @@ checkBounding state = state { manPacPos = (oOB (manPacPos state)), ghostPos = (o
 			| x < 0	    = (width,y)
 			| otherwise = (x,y)
 
---Checks if a point can move with a vector.
+-- Checks if a point can move with a vector.
 invalidDir :: GameState -> Point -> Vector -> Bool
 invalidDir state pos v =  (not (v == (manPacDir state))) && (not $ invalidDir' (pos `move` v) state)
 
---Checks if a point is inside one of the walls.
+-- Checks if a point is inside one of the walls.
 invalidDir' :: Point -> GameState -> Bool
 invalidDir' p state = or [overlaps (circleToBox p manRad) x | x <- (wallBlocks state)]
 
 -- Checks whether the game is over or not.
 gameOver :: GameState -> Bool
 gameOver state = ((circleToBox (ghostPos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || 
-				 ((circleToBox (ghost2Pos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) || (pellets state) == []
+				 ((circleToBox (ghost2Pos state) manRad) `overlaps` (circleToBox (manPacPos state) manRad)) ||
+				  (pellets state) == []
 
---The initial state for the game, needs resources to create.
+-- The initial state for the game, needs resources to create.
 initialState :: Tilemap -> [Animation] -> GameState
 initialState tile anims = GameState {
 	manPacPos = (width/2, manRad*6),
@@ -216,7 +218,7 @@ initialState tile anims = GameState {
     activeA = head anims
 }
 
---The list of all pellet points.
+-- The list of all pellet points.
 pelletsInit :: [Point]
 pelletsInit = --Top row
 			  [(manRad*(p+2),manRad*2) | p <- [1..10]] ++ [(manRad*(p+17),manRad*2) | p <- [1..10]] ++
