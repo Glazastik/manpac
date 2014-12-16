@@ -36,8 +36,8 @@ renderState :: Canvas -> GameState -> IO ()
 renderState can state = render can $ do
 	mapM_ wallPic $ (wallBlocks state) 
 	mapM_ pellet $ (pellets state)
-	ghostPic (tilemap state) (ghostPos state)
-	ghostPic (tilemap state) (ghost2Pos state)
+	mapPic (tilemap state) (0,1) (ghostPos state)
+	mapPic (tilemap state) (0,2) (ghost2Pos state)
 	--drawTile (tilemap state) (1,0) (manPacPos state)
 	animatePac (tilemap state) (manPacPos state) (activeA state)
 
@@ -142,9 +142,9 @@ setScore :: Int -> IO ()
 setScore score = withElem ("Score") $ \e -> do
   setProp e "innerText" ("score: " ++ show score)
 
---Draws a ghost from the tilemap at the given point.
-ghostPic :: Tilemap -> Point -> Picture ()
-ghostPic tmap pt = drawTile tmap (0,1) pt
+--Draws a static picture from the tilemap at the given point.
+mapPic :: Tilemap -> Point -> Point -> Picture ()
+mapPic tmap tile pos = drawTile tmap tile pos
 
 --Draws a wall at the given rectangle.
 wallPic :: Rect -> Picture ()
