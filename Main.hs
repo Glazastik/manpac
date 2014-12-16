@@ -28,6 +28,7 @@ tick can keysRef state = do
       True -> deathScene can keysRef state'
       False -> setTimeout 30 $ tick can keysRef state'
   where
+  	-- Not sure if hard to read or easy to read, does all neccessary functions to the gamestate.
     update keys = moveHomingGhost . incAnim . moveGhost . checkBounding . pelletCollide . moveManPac . changeManPacDir keys
 
 deathScene :: Canvas -> IORef (S.Set Char) -> GameState -> IO () 
@@ -41,6 +42,7 @@ deathScene can keysRef state = do
 		False -> setTimeout 30 $ deathScene can keysRef state'
 
   -- The ghosts moving while the game is over is to add effect, it is intentional.
+  -- Magic numbers are whatever the key values for space and enter is.
   where update = moveHomingGhost . moveGhost 
   	spaceKey = chr 32
   	enterKey = chr 13
