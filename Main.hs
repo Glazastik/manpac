@@ -150,8 +150,8 @@ drawTile tmap (idX,idY) (x,y) = translate (x - manRad ,y - manRad) $ scale (manR
 --setScore score = withElem ("Score") $ \e -> do
 --  setProp e "innerText" ("score: " ++ show score)
 setScore :: Int -> Picture ()
-setScore score = translate (2*manRad, 22*manRad) $ scale (5,5) 
-	$ color (RGB 255 255 255) $ text (0,0) ("Pellets eaten - " ++ (show score))
+setScore score = translate (2*manRad, 21.8*manRad) $ scale (5,4) 
+	$ color (RGB 255 255 255) $ text (0,0) ((show score))
 
 --Draws a static picture from the tilemap at the given point.
 mapPic :: Tilemap -> Point -> Point -> Picture ()
