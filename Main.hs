@@ -5,6 +5,9 @@ import Data.IORef
 import Data.Char
 import Logic
 
+import Test.QuickCheck
+
+
 {-
 	Anton Myrholm	19930924-7071
 	Viktor Karlsson	19930816-7213
