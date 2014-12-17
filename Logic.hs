@@ -2,7 +2,7 @@ module Logic where
 import qualified Data.Set as S
 import Data.List
 import Haste.Graphics.Canvas
-import Test.QuickCheck
+
 
 
 {-
