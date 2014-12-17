@@ -232,7 +232,7 @@ initialState tile anims = GameState {
 
 prop_move_moved :: Point -> Vector -> Bool
 prop_move_moved pt (0,0) = pt == (move pt (0,0))
-prop_mvoe_moved pt v = pt /= (move pt v)
+prop_move_moved pt v = pt /= (move pt v)
 
 ---------------------------------------------------------------
 
