@@ -3,7 +3,7 @@ import qualified Data.Set as S
 import Data.List
 import Haste.Graphics.Canvas
 
-
+import Test.QuickCheck
 
 {-
 	Anton Myrholm	19930924-7071
@@ -232,10 +232,22 @@ initialState tile anims = GameState {
 ---------------------------------------------------------------
 -- QuickCheck properties
 
+-- Tests if a vector moves
 prop_move_moved :: Point -> Vector -> Bool
 prop_move_moved pt (0,0) = pt == (move pt (0,0))
 prop_move_moved pt v = pt /= (move pt v)
 
+instance Arbitrary Rect where
+  arbitrary = do
+   x <- elements [0..1000]
+   y <- elements [0..1000]
+   w <- elements [0..1000]
+   l <- elements [0..1000]
+   return $ (Rect x y w l) 
+
+-- Tests associativity on overlaps.
+prop_overlaps_assoc :: Rect -> Rect -> Bool
+prop_overlaps_assoc r1 r2 = (overlaps r1 r2) == (overlaps r2 r1)
 ---------------------------------------------------------------
 
 -- The list of all pellet points.
