@@ -227,6 +227,15 @@ initialState tile anims = GameState {
     activeA = head anims
 }
 
+---------------------------------------------------------------
+-- QuickCheck properties
+
+prop_move_moved :: Point -> Vector -> Bool
+prop_move_moved pt (0,0) = pt == (move pt (0,0))
+prop_mvoe_moved pt v = pt /= (move pt v)
+
+---------------------------------------------------------------
+
 -- The list of all pellet points.
 pelletsInit :: [Point]
 pelletsInit = --Top row

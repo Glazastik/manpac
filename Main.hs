@@ -60,8 +60,7 @@ deathScene can keysRef state = do
 gameOverText :: Canvas -> Int -> IO ()
 gameOverText can score = 
 	renderOnTop can $ do 
-		color (RGBA 0 0 0 0.8) $ do fill $
-		 rect (2*manRad, 7*manRad) (width - (2*manRad), 15*manRad)
+		color (RGBA 0 0 0 0.8) $ do fill $ rect (2*manRad, 7*manRad) (width - (2*manRad), 15*manRad)
 
 		translate (5*manRad, 10*manRad) $ scale (6.5,5) $
 		 color (RGBA 255 0 50 0.9) $ text (0,0) "GAME OVER"
